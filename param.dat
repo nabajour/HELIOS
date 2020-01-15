@@ -6,7 +6,7 @@
 
 name =                                  0                                      (name of the output directory and file prefix.)
 precision =                             double                                 (double or single. but actually only double makes sense.)
-realtime plotting =                     no                                     (yes, no, interval value)
+realtime plotting =                     yes                                     (yes, no, interval value)
 ———
 
 ### GRID ###
@@ -47,7 +47,7 @@ energy budget correction =              yes                                     
 
 ### CONVECTIVE ADJUSTMENT ###
 
-convective adjustment =                 yes
+convective adjustment =                 no
 kappa value =                           0.2857                                 (file, number)
 entropy/kappa file path =               insert_path_here
 damping parameter =                     auto                                   (default choice: 'auto'. or any integer for debugging.)
@@ -61,6 +61,7 @@ path to stellar spectrum file =         ./input/stellar_sample.h5
 ——pre-tabulated——
 planet =                                HD189733b                               (manual, name in the file)
 path to planet data file =              ./input/planet_data.dat
+planet type =                           gas
 ——manual input——
 surface gravity [cm s^-2] =             3.05
 orbital distance [AU] =                 0.0115

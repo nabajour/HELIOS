@@ -586,7 +586,7 @@ __global__ void gridkernel(
     if (i < nlayer){
 
         p_lay[i] = p_boa * exp(log(p_toa / p_boa) * i / (nlayer - 1.0));
-        p_int[i] = p_lay[i] * exp(log(p_boa / p_toa)   *  1.0 / (2.0 * (nlayer - 1.0)));
+         p_int[i] = p_lay[i] * exp(log(p_boa / p_toa)   *  1.0 / (2.0 * (nlayer - 1.0)));
         if (i == nlayer - 1){
             p_int[i+1] = p_lay[i] * exp(log(p_toa / p_boa)   *  1.0 / (2.0 * (nlayer - 1.0)));
         }
@@ -1106,6 +1106,8 @@ __global__ void planck_interpol_interface(
 
 
 // calculation of transmission, w0, zeta-functions, and capital letters for the layer centers in the isothermal case
+// TODO: check ny meaning
+// kernel runs per wavelength bin, per wavelength sampling (?) and per layer
 __global__ void calc_trans_iso(
         utype* 	trans_wg,
         utype* 	delta_tau_wg,
@@ -1132,9 +1134,12 @@ __global__ void calc_trans_iso(
         int 	clouds,
         int 	scat_corr
 ){
-
+    // indices
+    // wavelength bin
     int x = threadIdx.x + blockIdx.x * blockDim.x;
+    // sampling point (?)
     int y = threadIdx.y + blockIdx.y * blockDim.y;
+    // layer
     int i = threadIdx.z + blockIdx.z * blockDim.z;
 
     if (x < nbin && y < ny && i < nlayer) {
