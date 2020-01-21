@@ -26,6 +26,10 @@ import pycuda.gpuarray as gpuarray
 from pycuda.compiler import SourceModule
 from source import host_functions as hsfunc
 
+import sys
+sys.path.append("/home/nab/prog/astro/unibe/Helios/Alfrodull/build/")
+import pylfrodull  # noqa
+
 
 class Compute(object):
     """ class incorporating the computational core of HELIOS """
@@ -70,7 +74,7 @@ class Compute(object):
         plancktable = self.mod.get_function("plancktable")
 
         # iteration over smaller kernels instead of one big to prevent kernel timeouts.
-        for p_iter in range(0,10):
+        for p_iter in range(0, 10):
 
             plancktable(quant.dev_planckband_grid,
                         quant.dev_opac_interwave,
@@ -81,7 +85,8 @@ class Compute(object):
                         quant.plancktable_dim,
                         quant.plancktable_step,
                         block=(16, 16, 1),
-                        grid=((int(quant.nbin) + 15) // 16, (int(quant.plancktable_dim/10 + 1) + 15) // 16, 1)
+                        grid=((int(quant.nbin) + 15) // 16,
+                              (int(quant.plancktable_dim/10 + 1) + 15) // 16, 1)
                         )
 
         cuda.Context.synchronize()
@@ -179,7 +184,8 @@ class Compute(object):
                       quant.fake_opac,
                       quant.nlayer,
                       block=(16, 16, 1),
-                      grid=((int(quant.nbin)+15) // 16, (int(quant.nlayer)+15) // 16, 1)
+                      grid=((int(quant.nbin)+15) // 16,
+                            (int(quant.nlayer)+15) // 16, 1)
                       )
 
         cuda.Context.synchronize()
@@ -200,7 +206,8 @@ class Compute(object):
                           quant.fake_opac,
                           quant.ninterface,
                           block=(16, 16, 1),
-                          grid=((int(quant.nbin) + 15) // 16, (int(quant.ninterface) + 15) // 16, 1)
+                          grid=((int(quant.nbin) + 15) // 16,
+                                (int(quant.ninterface) + 15) // 16, 1)
                           )
 
         cuda.Context.synchronize()
@@ -210,17 +217,17 @@ class Compute(object):
 
         mmm_interpol = self.mod.get_function("meanmolmass_interpol")
         mmm_interpol(quant.dev_T_lay,
-                        quant.dev_ktemp,
-                        quant.dev_meanmolmass_lay,
-                        quant.dev_opac_meanmass,
-                        quant.dev_p_lay,
-                        quant.dev_kpress,
-                        quant.npress,
-                        quant.ntemp,
-                        quant.nlayer,
-                        block=(16, 1, 1),
-                        grid=((int(quant.nlayer) + 15) // 16, 1, 1)
-                        )
+                     quant.dev_ktemp,
+                     quant.dev_meanmolmass_lay,
+                     quant.dev_opac_meanmass,
+                     quant.dev_p_lay,
+                     quant.dev_kpress,
+                     quant.npress,
+                     quant.ntemp,
+                     quant.nlayer,
+                     block=(16, 1, 1),
+                     grid=((int(quant.nlayer) + 15) // 16, 1, 1)
+                     )
 
         cuda.Context.synchronize()
 
@@ -338,13 +345,15 @@ class Compute(object):
                               quant.plancktable_dim,
                               quant.plancktable_step,
                               block=(16, 16, 1),
-                              grid=((int(quant.nbin)+15)//16, (int(quant.nlayer+2)+15)//16, 1)
+                              grid=((int(quant.nbin)+15)//16,
+                                    (int(quant.nlayer+2)+15)//16, 1)
                               )
 
         cuda.Context.synchronize()
 
         if quant.iso == 0:
-            planck_interpol_interface = self.mod.get_function("planck_interpol_interface")
+            planck_interpol_interface = self.mod.get_function(
+                "planck_interpol_interface")
 
             planck_interpol_interface(quant.dev_T_int,
                                       quant.dev_planckband_int,
@@ -354,7 +363,8 @@ class Compute(object):
                                       quant.plancktable_dim,
                                       quant.plancktable_step,
                                       block=(16, 16, 1),
-                                      grid=((int(quant.nbin)+15)//16, (int(quant.ninterface)+15)//16, 1)
+                                      grid=((int(quant.nbin)+15)//16,
+                                            (int(quant.ninterface)+15)//16, 1)
                                       )
 
         cuda.Context.synchronize()
@@ -367,23 +377,24 @@ class Compute(object):
             cloud_norm = self.mod.get_function("cloud_normalization")
 
             cloud_norm(
-                       quant.dev_p_lay,
-                       quant.dev_abs_cross_cloud,
-                       quant.dev_cloud_opac_lay,
-                       quant.dev_scat_cross_cloud,
-                       quant.dev_cloud_scat_cross_lay,
-                       quant.dev_scat_cross_lay,
-                       quant.dev_meanmolmass_lay,
-                       quant.dev_g_0_tot_lay,
-                       quant.dev_g_0_cloud,
-                       quant.g_0,
-                       quant.cloud_opac_tot,
-                       quant.cloud_press,
-                       quant.cloud_width,
-                       quant.nbin,
-                       quant.nlayer,
-                       block=(16, 16, 1),
-                       grid=((int(quant.nbin) + 15) // 16, (int(quant.nlayer) + 15) // 16, 1)
+                quant.dev_p_lay,
+                quant.dev_abs_cross_cloud,
+                quant.dev_cloud_opac_lay,
+                quant.dev_scat_cross_cloud,
+                quant.dev_cloud_scat_cross_lay,
+                quant.dev_scat_cross_lay,
+                quant.dev_meanmolmass_lay,
+                quant.dev_g_0_tot_lay,
+                quant.dev_g_0_cloud,
+                quant.g_0,
+                quant.cloud_opac_tot,
+                quant.cloud_press,
+                quant.cloud_width,
+                quant.nbin,
+                quant.nlayer,
+                block=(16, 16, 1),
+                grid=((int(quant.nbin) + 15) // 16,
+                      (int(quant.nlayer) + 15) // 16, 1)
             )
 
             cuda.Context.synchronize()
@@ -391,23 +402,24 @@ class Compute(object):
             if quant.iso == 0:
 
                 cloud_norm(
-                           quant.dev_p_int,
-                           quant.dev_abs_cross_cloud,
-                           quant.dev_cloud_opac_int,
-                           quant.dev_scat_cross_cloud,
-                           quant.dev_cloud_scat_cross_int,
-                           quant.dev_scat_cross_int,
-                           quant.dev_meanmolmass_int,
-                           quant.dev_g_0_tot_int,
-                           quant.dev_g_0_cloud,
-                           quant.g_0,
-                           quant.cloud_opac_tot,
-                           quant.cloud_press,
-                           quant.cloud_width,
-                           quant.nbin,
-                           quant.ninterface,
-                           block=(16, 16, 1),
-                           grid=((int(quant.nbin) + 15) // 16, (int(quant.ninterface) + 15) // 16, 1)
+                    quant.dev_p_int,
+                    quant.dev_abs_cross_cloud,
+                    quant.dev_cloud_opac_int,
+                    quant.dev_scat_cross_cloud,
+                    quant.dev_cloud_scat_cross_int,
+                    quant.dev_scat_cross_int,
+                    quant.dev_meanmolmass_int,
+                    quant.dev_g_0_tot_int,
+                    quant.dev_g_0_cloud,
+                    quant.g_0,
+                    quant.cloud_opac_tot,
+                    quant.cloud_press,
+                    quant.cloud_width,
+                    quant.nbin,
+                    quant.ninterface,
+                    block=(16, 16, 1),
+                    grid=((int(quant.nbin) + 15) // 16,
+                          (int(quant.ninterface) + 15) // 16, 1)
                 )
 
                 cuda.Context.synchronize()
@@ -443,7 +455,8 @@ class Compute(object):
                       quant.clouds,
                       quant.scat_corr,
                       block=(16, 4, 4),
-                      grid=((int(quant.nbin)+15)//16, (int(quant.ny)+3)//4, (int(quant.nlayer)+3)//4)
+                      grid=((int(quant.nbin)+15)//16, (int(quant.ny)+3) //
+                            4, (int(quant.nlayer)+3)//4)
                       )
 
         elif quant.iso == 0:
@@ -489,7 +502,8 @@ class Compute(object):
                          quant.clouds,
                          quant.scat_corr,
                          block=(16, 4, 4),
-                         grid=((int(quant.nbin) + 15) // 16, (int(quant.ny) + 3) // 4, (int(quant.nlayer) + 3) // 4)
+                         grid=((int(quant.nbin) + 15) // 16,
+                               (int(quant.ny) + 3) // 4, (int(quant.nlayer) + 3) // 4)
                          )
 
         cuda.Context.synchronize()
@@ -531,7 +545,8 @@ class Compute(object):
                      quant.nbin,
                      quant.ny,
                      block=(4, 32, 4),
-                     grid=((int(quant.ninterface) + 3) // 4, (int(quant.nbin) + 31) // 32, (int(quant.ny) + 3) // 4)
+                     grid=((int(quant.ninterface) + 3) // 4,
+                           (int(quant.nbin) + 31) // 32, (int(quant.ny) + 3) // 4)
                      )
 
         elif quant.iso == 0:
@@ -553,7 +568,8 @@ class Compute(object):
                         quant.nbin,
                         quant.ny,
                         block=(4, 32, 4),
-                        grid=((int(quant.ninterface) + 3) // 4, (int(quant.nbin) + 31) // 32, (int(quant.ny) + 3) // 4)
+                        grid=((int(quant.ninterface) + 3) // 4,
+                              (int(quant.nbin) + 31) // 32, (int(quant.ny) + 3) // 4)
                         )
 
         cuda.Context.synchronize()
@@ -599,12 +615,14 @@ class Compute(object):
                                  quant.clouds,
                                  quant.surf_albedo,
                                  block=(16, 16, 1),
-                                 grid=((int(quant.nbin)+15)//16, (int(quant.ny)+15)//16, 1)
+                                 grid=((int(quant.nbin)+15)//16,
+                                       (int(quant.ny)+15)//16, 1)
                                  )
 
             elif quant.iso == 0:
 
-                fband_noniso_notabu = self.mod.get_function("fband_noniso_notabu")
+                fband_noniso_notabu = self.mod.get_function(
+                    "fband_noniso_notabu")
                 fband_noniso_notabu(quant.dev_F_down_wg,
                                     quant.dev_F_up_wg,
                                     quant.dev_Fc_down_wg,
@@ -647,7 +665,8 @@ class Compute(object):
                                     quant.dev_trans_wg_upper,
                                     quant.dev_trans_wg_lower,
                                     block=(16, 16, 1),
-                                    grid=((int(quant.nbin)+15)//16, (int(quant.ny)+15)//16, 1)
+                                    grid=((int(quant.nbin)+15)//16,
+                                          (int(quant.ny)+15)//16, 1)
                                     )
 
             cuda.Context.synchronize()
@@ -655,28 +674,45 @@ class Compute(object):
     def integrate_flux(self, quant):
         """ integrates the spectral fluxes first over each bin and then the whole spectral range """
 
-        if quant.prec == "double":
-            integrate_flux = self.mod.get_function("integrate_flux_double")
-        elif quant.prec == "single":
-            integrate_flux = self.mod.get_function("integrate_flux_single")
+        pylfrodull.integrate_flux(quant.dev_opac_deltawave.ptr,
+                                  quant.dev_F_down_tot.ptr,
+                                  quant.dev_F_up_tot.ptr,
+                                  quant.dev_F_net.ptr,
+                                  quant.dev_F_down_wg.ptr,
+                                  quant.dev_F_up_wg.ptr,
+                                  quant.dev_F_dir_wg.ptr,
+                                  quant.dev_F_down_band.ptr,
+                                  quant.dev_F_up_band.ptr,
+                                  quant.dev_F_dir_band.ptr,
+                                  quant.dev_gauss_weight.ptr,
+                                  quant.nbin,
+                                  quant.ninterface,
+                                  quant.ny,
+                                  32, 4, 8,
+                                  1, 1, 1)
 
-        integrate_flux(quant.dev_opac_deltawave,
-                       quant.dev_F_down_tot,
-                       quant.dev_F_up_tot,
-                       quant.dev_F_net,
-                       quant.dev_F_down_wg,
-                       quant.dev_F_up_wg,
-                       quant.dev_F_dir_wg,
-                       quant.dev_F_down_band,
-                       quant.dev_F_up_band,
-                       quant.dev_F_dir_band,
-                       quant.dev_gauss_weight,
-                       quant.nbin,
-                       quant.ninterface,
-                       quant.ny,
-                       block=(32, 4, 8),
-                       grid=(1, 1, 1)
-                       )
+        # if quant.prec == "double":
+        #     integrate_flux = self.mod.get_function("integrate_flux_double")
+        # elif quant.prec == "single":
+        #     integrate_flux = self.mod.get_function("integrate_flux_single")
+
+        # integrate_flux(quant.dev_opac_deltawave,
+        #                quant.dev_F_down_tot,
+        #                quant.dev_F_up_tot,
+        #                quant.dev_F_net,
+        #                quant.dev_F_down_wg,
+        #                quant.dev_F_up_wg,
+        #                quant.dev_F_dir_wg,
+        #                quant.dev_F_down_band,
+        #                quant.dev_F_up_band,
+        #                quant.dev_F_dir_band,
+        #                quant.dev_gauss_weight,
+        #                quant.nbin,
+        #                quant.ninterface,
+        #                quant.ny,
+        #                block=(32, 4, 8),
+        #                grid=(1, 1, 1)
+        #                )
 
         # OLD Version of integrating the fluxes -- keep here for debugging purposes
         # integrate_flux = self.mod.get_function("integrate_flux")
@@ -794,11 +830,13 @@ class Compute(object):
             if quant.iter_value % 10 == 0:
 
                 if Vmod.V_coupling == 0:
-                    self.interpolate_opacities_and_scattering_cross_sections(quant)
+                    self.interpolate_opacities_and_scattering_cross_sections(
+                        quant)
                     self.interpolate_meanmolmass(quant)
                 elif Vmod.V_coupling == 1:
                     if Vmod.V_iter_nr == 0:
-                        self.interpolate_opacities_and_scattering_cross_sections(quant)
+                        self.interpolate_opacities_and_scattering_cross_sections(
+                            quant)
                         self.interpolate_meanmolmass(quant)
                     Vmod.interpolate_molecular_and_mixed_opac(quant)
                     Vmod.combine_to_mixed_opacities(quant)
@@ -828,9 +866,11 @@ class Compute(object):
                 quant.marked_red = np.zeros(quant.nlayer)
 
                 if quant.iter_value % 100 == 0:
-                    print("\nWe are running \"" + quant.name + "\" at iteration step nr. : "+str(quant.iter_value))
+                    print("\nWe are running \"" + quant.name +
+                          "\" at iteration step nr. : "+str(quant.iter_value))
                     if quant.iter_value > 99:
-                        print("Time for the last 100 steps [s]: {:.2f}".format(time_loop * 1e-3))
+                        print("Time for the last 100 steps [s]: {:.2f}".format(
+                            time_loop * 1e-3))
                 if quant.iter_value >= quant.foreplay:
 
                     # chunk for the calculation of surface temperature
@@ -852,7 +892,8 @@ class Compute(object):
                             quant.marked_red[i] = 1
 
                     if quant.iter_value % 100 == 0:
-                        print("Layers converged: "+str(abortsum)+" out of "+str(quant.nlayer)+".")
+                        print("Layers converged: "+str(abortsum) +
+                              " out of "+str(quant.nlayer)+".")
 
                 # checks whether to continue the loop
                 condition = abortsum < quant.nlayer
@@ -874,7 +915,8 @@ class Compute(object):
                 if quant.iter_value > 1e5:
                     write.write_abort_file(quant)
 
-                    print("\nRun exceeds allowed maximum allowed number of iteration steps. Aborting...")
+                    print(
+                        "\nRun exceeds allowed maximum allowed number of iteration steps. Aborting...")
 
                     raise SystemExit()
 
@@ -884,7 +926,8 @@ class Compute(object):
         end_total.record()
         end_total.synchronize()
         time_total = start_total.time_till(end_total)
-        print("\nTime for radiative iteration [s]: {:.2f}".format(time_total * 1e-3))
+        print("\nTime for radiative iteration [s]: {:.2f}".format(
+            time_total * 1e-3))
         print("Total number of iterative steps: "+str(quant.iter_value))
 
     def convection_loop(self, quant, write, rt_plot, Vmod):
@@ -916,9 +959,11 @@ class Compute(object):
                 # measures time
                 start_loop = cuda.Event()
                 end_loop = cuda.Event()
-                print("\nConvectively unstable layers found. Starting convective adjustment")
+                print(
+                    "\nConvectively unstable layers found. Starting convective adjustment")
             else:
-                print("\nAll layers convectively stable. No convective adjustment necessary.\n")
+                print(
+                    "\nAll layers convectively stable. No convective adjustment necessary.\n")
 
             # quantities required on the host for the first convective adjustment
             quant.F_net = quant.dev_F_net.get()
@@ -930,9 +975,11 @@ class Compute(object):
                     start_loop.record()
 
                 if quant.iter_value % 100 == 0:
-                    print("\nWe are running \"" + quant.name + "\" at iteration step nr. : "+str(quant.iter_value))
+                    print("\nWe are running \"" + quant.name +
+                          "\" at iteration step nr. : "+str(quant.iter_value))
                     if quant.iter_value > 99:
-                        print("Time for the last 100 steps [s]: {:.2f}".format(time_loop * 1e-3))
+                        print("Time for the last 100 steps [s]: {:.2f}".format(
+                            time_loop * 1e-3))
                 # start with the convective adjustment and then recalculate the rad. fluxes, go back to conv. adjustment, then rad. fluxes, etc.
                 self.interpolate_temperatures(quant)
 
@@ -958,11 +1005,13 @@ class Compute(object):
                 self.interpolate_temperatures(quant)
 
                 if Vmod.V_coupling == 0:
-                    self.interpolate_opacities_and_scattering_cross_sections(quant)
+                    self.interpolate_opacities_and_scattering_cross_sections(
+                        quant)
                     self.interpolate_meanmolmass(quant)
                 elif Vmod.V_coupling == 1:
                     if Vmod.V_iter_nr == 0:
-                        self.interpolate_opacities_and_scattering_cross_sections(quant)
+                        self.interpolate_opacities_and_scattering_cross_sections(
+                            quant)
                         self.interpolate_meanmolmass(quant)
                     Vmod.interpolate_molecular_and_mixed_opac(quant)
                     Vmod.combine_to_mixed_opacities(quant)
@@ -1003,7 +1052,8 @@ class Compute(object):
                 quant.dev_F_net = gpuarray.to_gpu(quant.F_net)
 
                 # checks whether to continue the loop
-                condition = not(hsfunc.check_for_global_local_equilibrium(quant)) or quant.iter_value < 100
+                condition = not(hsfunc.check_for_global_local_equilibrium(
+                    quant)) or quant.iter_value < 100
 
                 # relax global convergence limit somewhat if taking too long to converge
                 if quant.iter_value == 1e4:
@@ -1036,7 +1086,8 @@ class Compute(object):
 
                     write.write_abort_file(quant)
 
-                    print("\nRun exceeds allowed maximum allowed number of iteration steps. Aborting...")
+                    print(
+                        "\nRun exceeds allowed maximum allowed number of iteration steps. Aborting...")
 
                     raise SystemExit()
 
@@ -1044,29 +1095,33 @@ class Compute(object):
             end_total.synchronize()
             time_total = start_total.time_till(end_total)
 
-            print("\nTime for rad.-conv. iteration [s]: {:.2f}".format(time_total * 1e-3))
+            print(
+                "\nTime for rad.-conv. iteration [s]: {:.2f}".format(time_total * 1e-3))
             print("Total number of iterative steps: " + str(quant.iter_value))
 
     def integrate_optdepth_transmission(self, quant):
         """ calculates the transmission function in each layer """
 
         if quant.iso == 1:
-            integrate_optdepth_trans = self.mod.get_function("integrate_optdepth_transmission_iso")
+            integrate_optdepth_trans = self.mod.get_function(
+                "integrate_optdepth_transmission_iso")
 
             integrate_optdepth_trans(quant.dev_trans_wg,
-                            quant.dev_trans_band,
-                            quant.dev_delta_tau_wg,
-                            quant.dev_delta_tau_band,
-                            quant.dev_gauss_weight,
-                            quant.nbin,
-                            quant.nlayer,
-                            quant.ny,
-                            block=(16, 16, 1),
-                            grid=((int(quant.nbin)+15)//16, (int(quant.nlayer)+15)//16, 1)
-                            )
+                                     quant.dev_trans_band,
+                                     quant.dev_delta_tau_wg,
+                                     quant.dev_delta_tau_band,
+                                     quant.dev_gauss_weight,
+                                     quant.nbin,
+                                     quant.nlayer,
+                                     quant.ny,
+                                     block=(16, 16, 1),
+                                     grid=((int(quant.nbin)+15)//16,
+                                           (int(quant.nlayer)+15)//16, 1)
+                                     )
 
         elif quant.iso == 0:
-            integrate_optdepth_trans = self.mod.get_function("integrate_optdepth_transmission_noniso")
+            integrate_optdepth_trans = self.mod.get_function(
+                "integrate_optdepth_transmission_noniso")
 
             integrate_optdepth_trans(quant.dev_trans_wg_upper,
                                      quant.dev_trans_wg_lower,
@@ -1079,7 +1134,8 @@ class Compute(object):
                                      quant.nlayer,
                                      quant.ny,
                                      block=(16, 16, 1),
-                                     grid=((int(quant.nbin) + 15) // 16, (int(quant.nlayer) + 15) // 16, 1)
+                                     grid=((int(quant.nbin) + 15) // 16,
+                                           (int(quant.nlayer) + 15) // 16, 1)
                                      )
 
         cuda.Context.synchronize()
@@ -1100,7 +1156,8 @@ class Compute(object):
                             quant.nlayer,
                             quant.ny,
                             block=(16, 16, 1),
-                            grid=((int(quant.nbin)+15)//16, (int(quant.nlayer)+15)//16, 1)
+                            grid=((int(quant.nbin)+15)//16,
+                                  (int(quant.nlayer)+15)//16, 1)
                             )
 
         elif quant.iso == 0:
@@ -1117,7 +1174,8 @@ class Compute(object):
                             quant.nlayer,
                             quant.ny,
                             block=(16, 16, 1),
-                            grid=((int(quant.nbin) + 15) // 16, (int(quant.nlayer) + 15) // 16, 1)
+                            grid=((int(quant.nbin) + 15) // 16,
+                                  (int(quant.nlayer) + 15) // 16, 1)
                             )
 
         cuda.Context.synchronize()
@@ -1164,6 +1222,7 @@ class Compute(object):
                        block=(16, 1, 1),
                        grid=((int(quant.ninterface)+15)//16, 1, 1)
                        )
+
 
 if __name__ == "__main__":
     print("This module is for computational purposes. It is the working horse of the whole code.")

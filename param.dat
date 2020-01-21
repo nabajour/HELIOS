@@ -4,7 +4,7 @@
 
 ### GENERAL ###                                                                 ### INFO ###
 
-name =                                  0                                      (name of the output directory and file prefix.)
+name =                                  pylfrodull                                      (name of the output directory and file prefix.)
 precision =                             double                                 (double or single. but actually only double makes sense.)
 realtime plotting =                     yes                                     (yes, no, interval value)
 ———
