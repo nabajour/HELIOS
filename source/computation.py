@@ -819,37 +819,107 @@ class Compute(object):
             if quant.iter_value % 100 == 0:
                 start_loop.record()
 
-            # chunk for the calculation of surface emission
-            self.calc_surface_planck(quant)
-            if quant.iter_value > 0:
-                self.correct_surface_emission(quant)
+            # # chunk for the calculation of surface emission
+            # self.calc_surface_planck(quant)
+            correct_surface_emissions = quant.iter_value > 0
 
-            self.interpolate_temperatures(quant)
-            self.interpolate_planck(quant)
+            # if correct_surface_emissions:
+            #     self.correct_surface_emission(quant)
 
-            if quant.iter_value % 10 == 0:
+            # self.interpolate_temperatures(quant)
+            # self.interpolate_planck(quant)
 
-                if Vmod.V_coupling == 0:
-                    self.interpolate_opacities_and_scattering_cross_sections(
-                        quant)
-                    self.interpolate_meanmolmass(quant)
-                elif Vmod.V_coupling == 1:
-                    if Vmod.V_iter_nr == 0:
-                        self.interpolate_opacities_and_scattering_cross_sections(
-                            quant)
-                        self.interpolate_meanmolmass(quant)
-                    Vmod.interpolate_molecular_and_mixed_opac(quant)
-                    Vmod.combine_to_mixed_opacities(quant)
-                self.interpolate_kappa(quant)
+            interp_and_calc_flux_step = quant.iter_value % 10 == 0
+            # if interp_and_calc_flux_step:
+            #     if Vmod.V_coupling == 0:
+            #         self.interpolate_opacities_and_scattering_cross_sections(
+            #             quant)
+            #         self.interpolate_meanmolmass(quant)
+            #     elif Vmod.V_coupling == 1:
+            #         if Vmod.V_iter_nr == 0:
+            #             self.interpolate_opacities_and_scattering_cross_sections(
+            #                 quant)
+            #             self.interpolate_meanmolmass(quant)
+            #         Vmod.interpolate_molecular_and_mixed_opac(quant)
+            #         Vmod.combine_to_mixed_opacities(quant)
+            #     self.interpolate_kappa(quant)
+
+            # TODO: check it's not used anywhere else
+            if quant.kappa_manual_value == "file":
+                use_kappa_manual = False
+                kappa_kernel_value = quant.fl_prec(0)
+
+            else:
+                use_kappa_manual = True
+                kappa_kernel_value = quant.fl_prec(quant.kappa_manual_value)
+
+            pylfrodull.pyprepare_compute_flux(
+                quant.dev_planckband_lay.ptr,
+                quant.dev_planckband_grid,
+                quant.dev_planckband_int.ptr,
+                quant.dev_starflux.ptr,
+                quant.dev_opac_interwave.ptr,
+                quant.dev_opac_deltawave.ptr,
+                quant.dev_F_down_tot.ptr,
+                quant.dev_T_lay.ptr,
+                quant.dev_T_int,
+                quant.dev_ktemp.ptr,
+                quant.dev_p_lay.ptr,
+                quant.dev_p_int.ptr,
+                quant.dev_kpress.ptr,
+                quant.dev_opac_k.ptr,
+                quant.dev_opac_wg_lay,
+                quant.dev_opac_wg_int,
+                quant.dev_opac_scat_cross.ptr,
+                quant.dev_scat_cross_lay.ptr,
+                quant.dev_scat_cross_int,
+                quant.dev_meanmolmass_lay.ptr,
+                quant.dev_meanmolmass_int,
+                quant.dev_opac_meanmass.ptr,
+                quant.dev_opac_kappa.ptr,
+                quant.dev_entr_temp.ptr,
+                quant.dev_entr_press.ptr,
+                quant.dev_kappa_lay.ptr,
+                quant.dev_kappa_int.ptr,
+                quant.ninterface,
+                quant.nbin,
+                quant.nlayer,
+                quant.iter_value,
+                quant.real_star,
+                quant.npress,
+                quant.ntemp,
+                quant.ny,
+                quant.entr_npress,
+                quant.entr_ntemp,
+                quant.fake_opac,
+                quant.T_surf,
+                quant.surf_albedo,
+                quant.plancktable_dim,
+                quant.plancktable_step,
+                use_kappa_manual,
+                kappa_kernel_value,
+                quant.iso,
+                correct_surface_emissions,
+                interp_and_calc_flux_step
+            )
+
+            if interp_and_calc_flux_step:
+                # TODO: check when that c_p is needed
                 self.calculate_c_p(quant)
+                # this not used in thor
                 self.normalize_cloud_scattering(quant)
+
                 self.calculate_transmission(quant)
 
+                # this done by thor
                 self.calculate_delta_z(quant)
                 quant.delta_z_lay = quant.dev_delta_z_lay.get()
                 hsfunc.calculate_height_z(quant)
                 quant.dev_z_lay = gpuarray.to_gpu(quant.z_lay)
+
+                # compute beam flux
                 self.calculate_direct_beamflux(quant)
+
             self.populate_spectral_flux(quant)
             self.integrate_flux(quant)
 
