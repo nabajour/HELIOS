@@ -844,7 +844,7 @@ class Compute(object):
             #         Vmod.combine_to_mixed_opacities(quant)
             #     self.interpolate_kappa(quant)
 
-            # TODO: check it's not used anywhere else
+            # TODO: check it's not used anywhere else (stored inside quant object?)
             if quant.kappa_manual_value == "file":
                 use_kappa_manual = False
                 kappa_kernel_value = quant.fl_prec(0)
