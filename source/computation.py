@@ -27,7 +27,7 @@ from pycuda.compiler import SourceModule
 from source import host_functions as hsfunc
 
 import sys
-sys.path.append("/home/nab/prog/astro/unibe/Helios/Alfrodull/build/")
+sys.path.append("/home/nab/prog/astro/unibe/THOR-dev/Alfrodull/build/")
 import pylfrodull  # noqa
 
 
