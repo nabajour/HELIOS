@@ -21,16 +21,14 @@
 #     <http://www.gnu.org/licenses/>.
 # ==============================================================================
 
-
-from source import read
-from source import quantities as quant
-from source import host_functions as hsfunc
-from source import write
-from source import computation as comp
-from source import realtime_plotting as rt_plot
-from source import clouds
 from source import Vcoupling_modification as Vmod
-
+from source import clouds
+from source import realtime_plotting as rt_plot
+from source import computation as comp
+from source import write
+from source import host_functions as hsfunc
+from source import quantities as quant
+from source import read
 import sys
 sys.path.append("/home/nab/prog/astro/unibe/THOR-dev/Alfrodull/build/")
 import pylfrodull  # noqa
