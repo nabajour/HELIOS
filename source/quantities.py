@@ -248,7 +248,6 @@ class Store(object):
         self.f_vo_lay = None
         self.dev_f_vo_lay = None
 
-
         # arrays to be copied CPU --> GPU --> CPU
         # these are copied to GPU by "gpuarray" and copied back
         self.T_lay = []
@@ -399,7 +398,7 @@ class Store(object):
         self.contr_h2o = None
         self.dev_contr_h2o = None
         self.contr_co2 = None
-        self.dev_contr_co2= None
+        self.dev_contr_co2 = None
         self.contr_co = None
         self.dev_contr_co = None
         self.contr_ch4 = None
@@ -526,7 +525,8 @@ class Store(object):
         self.nlayer_nbin = np.int32(self.nlayer * self.nbin)
         self.nlayer_plus2_nbin = np.int32((self.nlayer+2) * self.nbin)
         self.ninterface_nbin = np.int32(self.ninterface * self.nbin)
-        self.ninterface_wg_nbin = np.int32(self.ninterface * self.ny * self.nbin)
+        self.ninterface_wg_nbin = np.int32(
+            self.ninterface * self.ny * self.nbin)
         self.nlayer_wg_nbin = np.int32(self.ninterface * self.ny * self.nbin)
         self.nplanck_grid = np.int32((self.plancktable_dim+1) * self.nbin)
 
@@ -547,7 +547,7 @@ class Store(object):
         self.F_down_tot = np.zeros(self.ninterface, self.fl_prec)
         self.F_dir_tot = np.zeros(self.ninterface, self.fl_prec)
         self.opac_band_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
-        self.scat_cross_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
+        # self.scat_cross_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
         self.F_net = np.zeros(self.ninterface, self.fl_prec)
         self.F_net_diff = np.zeros(self.nlayer, self.fl_prec)
         self.p_lay = np.zeros(self.nlayer, self.fl_prec)
@@ -569,11 +569,15 @@ class Store(object):
         self.trans_weight_band = np.zeros(self.nlayer_nbin, self.fl_prec)
         self.contr_func_band = np.zeros(self.nlayer_nbin, self.fl_prec)
         self.cloud_opac_lay = np.zeros(self.nlayer, self.fl_prec)
-        self.cloud_opac_int = np.zeros(self.ninterface, self.fl_prec)  # to have zeros when reading in later
+        # to have zeros when reading in later
+        self.cloud_opac_int = np.zeros(self.ninterface, self.fl_prec)
         self.cloud_scat_cross_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
-        self.cloud_scat_cross_int = np.zeros(self.ninterface_nbin, self.fl_prec)  # to have zeros when reading in later
+        # to have zeros when reading in later
+        self.cloud_scat_cross_int = np.zeros(
+            self.ninterface_nbin, self.fl_prec)
         self.g_0_tot_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
-        self.g_0_tot_int = np.zeros(self.ninterface_nbin, self.fl_prec)  # to have zeros when reading in later
+        # to have zeros when reading in later
+        self.g_0_tot_int = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.delta_z_lay = np.zeros(self.nlayer, self.fl_prec)
         self.z_lay = np.zeros(self.nlayer, self.fl_prec)
         self.contr_h2o = np.zeros(self.nbin, self.fl_prec)
@@ -592,7 +596,7 @@ class Store(object):
         self.contr_cloud = np.zeros(self.nbin, self.fl_prec)
         self.conv_layer = np.zeros(self.nlayer, np.int32)
 
-        if Vmod.V_iter_nr == 0: ## otherwise already filled with values
+        if Vmod.V_iter_nr == 0:  # otherwise already filled with values
             self.meanmolmass_lay = np.zeros(self.nlayer, self.fl_prec)
             self.f_h2o_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
             self.f_co2_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
@@ -684,8 +688,6 @@ class Store(object):
         # self.dev_f_na_tab = gpuarray.to_gpu(self.f_na_tab)
         # self.dev_f_k_tab = gpuarray.to_gpu(self.f_k_tab)
 
-
-
         # zero arrays (copying anyway to obtain the gpuarray functionality)
         # those arrays will be copied to host at the end of computation or need to be zero-filled
         self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
@@ -699,7 +701,7 @@ class Store(object):
         self.dev_F_down_tot = gpuarray.to_gpu(self.F_down_tot)
         self.dev_F_dir_tot = gpuarray.to_gpu(self.F_dir_tot)
         self.dev_opac_band_lay = gpuarray.to_gpu(self.opac_band_lay)
-        self.dev_scat_cross_lay = gpuarray.to_gpu(self.scat_cross_lay)
+#        self.dev_scat_cross_lay = gpuarray.to_gpu(self.scat_cross_lay)
         self.dev_F_net = gpuarray.to_gpu(self.F_net)
         self.dev_F_net_diff = gpuarray.to_gpu(self.F_net_diff)
         self.dev_p_lay = gpuarray.to_gpu(self.p_lay)
@@ -721,7 +723,8 @@ class Store(object):
         self.dev_contr_func_band = gpuarray.to_gpu(self.contr_func_band)
         self.dev_cloud_opac_lay = gpuarray.to_gpu(self.cloud_opac_lay)
         self.dev_cloud_opac_int = gpuarray.to_gpu(self.cloud_opac_int)
-        self.dev_cloud_scat_cross_lay = gpuarray.to_gpu(self.cloud_scat_cross_lay)
+        self.dev_cloud_scat_cross_lay = gpuarray.to_gpu(
+            self.cloud_scat_cross_lay)
         self.dev_delta_z_lay = gpuarray.to_gpu(self.delta_z_lay)
         self.dev_z_lay = gpuarray.to_gpu(self.z_lay)
         self.dev_g_0_tot_lay = gpuarray.to_gpu(self.g_0_tot_lay)
@@ -749,7 +752,8 @@ class Store(object):
             self.dev_Fc_up_wg = gpuarray.to_gpu(self.Fc_up_wg)
             self.dev_Fc_dir_wg = gpuarray.to_gpu(self.Fc_dir_wg)
             self.dev_g_0_tot_int = gpuarray.to_gpu(self.g_0_tot_int)
-            self.dev_cloud_scat_cross_int = gpuarray.to_gpu(self.cloud_scat_cross_int)
+            self.dev_cloud_scat_cross_int = gpuarray.to_gpu(
+                self.cloud_scat_cross_int)
 
     def copy_device_to_host(self):
         """ copies relevant device arrays to host """
@@ -762,7 +766,7 @@ class Store(object):
         self.F_down_tot = self.dev_F_down_tot.get()
         self.F_dir_tot = self.dev_F_dir_tot.get()
         self.opac_band_lay = self.dev_opac_band_lay.get()
-        self.scat_cross_lay = self.dev_scat_cross_lay.get()
+        # self.scat_cross_lay = self.dev_scat_cross_lay.get()
         self.F_net = self.dev_F_net.get()
         self.F_net_diff = self.dev_F_net_diff.get()
         self.p_lay = self.dev_p_lay.get()
@@ -843,7 +847,7 @@ class Store(object):
 
         if self.iso == 0:
             self.dev_opac_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-            self.dev_scat_cross_int = cuda.mem_alloc(size_ninterface_nbin)
+#            self.dev_scat_cross_int = cuda.mem_alloc(size_ninterface_nbin)
             self.dev_delta_tau_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
             self.dev_delta_tau_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
             self.dev_trans_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
@@ -877,8 +881,10 @@ class Store(object):
                 self.dev_opac_h2s_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
                 self.dev_opac_na_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
                 self.dev_opac_k_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
-                self.dev_opac_cia_h2h2_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
-                self.dev_opac_cia_h2he_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
+                self.dev_opac_cia_h2h2_wg_lay = cuda.mem_alloc(
+                    size_nlayer_wg_nbin)
+                self.dev_opac_cia_h2he_wg_lay = cuda.mem_alloc(
+                    size_nlayer_wg_nbin)
 
                 if self.iso == 0:
 
@@ -893,20 +899,35 @@ class Store(object):
                     self.dev_f_vo_int = cuda.mem_alloc(size_ninterface)
                     self.dev_f_h2_int = cuda.mem_alloc(size_ninterface)
                     self.dev_f_he_int = cuda.mem_alloc(size_ninterface)
-                    self.dev_opac_h2o_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_co2_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_co_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_ch4_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_nh3_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_hcn_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_c2h2_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_tio_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_vo_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_h2s_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_na_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_k_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_cia_h2h2_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-                    self.dev_opac_cia_h2he_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
+                    self.dev_opac_h2o_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_co2_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_co_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_ch4_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_nh3_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_hcn_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_c2h2_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_tio_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_vo_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_h2s_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_na_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_k_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_cia_h2h2_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+                    self.dev_opac_cia_h2he_wg_int = cuda.mem_alloc(
+                        size_ninterface_wg_nbin)
+
 
 if __name__ == "__main__":
     print("This module is for storing and allocating all the necessary quantities used in HELIOS"

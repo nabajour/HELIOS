@@ -21,6 +21,8 @@
 #     <http://www.gnu.org/licenses/>.
 # ==============================================================================
 
+import pycuda.driver as cuda
+import numpy as np
 from source import Vcoupling_modification as Vmod
 from source import clouds
 from source import realtime_plotting as rt_plot
@@ -93,7 +95,17 @@ def run_helios():
 
     computer.radiation_loop(keeper, writer, plotter, Vmodder)
     computer.convection_loop(keeper, writer, plotter, Vmodder)
+    ##########################
+    dev_scat_cross_section_lay_ptr = 0
+    dev_scat_cross_section_int_ptr = 0
+    dev_interwave_ptr = 0
+    dev_deltawave_ptr = 0
+    pylfrodull.get_dev_pointers(dev_scat_cross_section_lay_ptr,
+                                dev_scat_cross_section_int_ptr,
+                                dev_interwave_ptr,
+                                dev_deltawave_ptr)
 
+    ##########################
     computer.integrate_optdepth_transmission(keeper)
     computer.calculate_contribution_function(keeper)
     computer.interpolate_entropy(keeper)
@@ -102,6 +114,18 @@ def run_helios():
 
     # copy everything back to host and write to files
     keeper.copy_device_to_host()
+    nlayer = keeper.nlayer
+    nbin = keeper.nbin
+    ninterface = keeper.ninterface
+
+    keeper.scat_cross_lay = cuda.from_device(dev_scat_cross_section_lay_ptr,
+                                             nlayer*nbin,
+                                             np.float64)
+
+    keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
+                                             ninterface*nbin,
+                                             np.float64)
+
     hsfunc.calculate_conv_flux(keeper)
     hsfunc.calc_F_ratio(keeper)
     writer.write_info(keeper, reader, Vmodder)
