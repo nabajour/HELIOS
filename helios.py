@@ -100,10 +100,10 @@ def run_helios():
     dev_scat_cross_section_int_ptr = 0
     dev_interwave_ptr = 0
     dev_deltawave_ptr = 0
-    pylfrodull.get_dev_pointers(dev_scat_cross_section_lay_ptr,
-                                dev_scat_cross_section_int_ptr,
-                                dev_interwave_ptr,
-                                dev_deltawave_ptr)
+    (dev_scat_cross_section_int_ptr,
+     dev_scat_cross_section_lay_ptr,
+     dev_interwave_ptr,
+     dev_deltawave_ptr) = pylfrodull.get_dev_pointers()
 
     ##########################
     computer.integrate_optdepth_transmission(keeper)
