@@ -36,7 +36,10 @@ import pylfrodull  # noqa
 
 def run_helios():
     """ runs a normal HELIOS run with standard I/O """
+
+    ##########################
     pylfrodull.init_alfrodull()
+    ##########################
 
     reader = read.Read()
     keeper = quant.Store()
@@ -73,6 +76,11 @@ def run_helios():
     keeper.copy_host_to_device(Vmodder)
     keeper.allocate_on_device(Vmodder)
 
+    ##########################
+    pylfrodull.init_parameters(quant.nlayer, quant.iso)
+
+    pylfrodull.allocate()
+    ##########################
     # conduct the GPU core computations
     computer.construct_planck_table(keeper)
     computer.correct_incident_energy(keeper)

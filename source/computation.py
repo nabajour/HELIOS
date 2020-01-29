@@ -164,90 +164,6 @@ class Compute(object):
 
         cuda.Context.synchronize()
 
-    def interpolate_opacities_and_scattering_cross_sections(self, quant):
-        """ builds the layer and interface opacities by interpolating the values from the opacity table """
-
-        opac_interpol = self.mod.get_function("opac_interpol")
-
-        opac_interpol(quant.dev_T_lay,  # in, layer temp
-                      quant.dev_ktemp,  # in, ref temp
-                      quant.dev_p_lay,  # in, layer press
-                      quant.dev_kpress,  # in, ref press
-                      quant.dev_opac_k,  # in, ref opacity
-                      quant.dev_opac_wg_lay,  # out, opacities
-                      quant.dev_opac_scat_cross,  # in, ref scat cross sect
-                      quant.dev_scat_cross_lay,  # out, scat cross sect
-                      quant.npress,
-                      quant.ntemp,
-                      quant.ny,
-                      quant.nbin,
-                      quant.fake_opac,
-                      quant.nlayer,
-                      block=(16, 16, 1),
-                      grid=((int(quant.nbin)+15) // 16,
-                            (int(quant.nlayer)+15) // 16, 1)
-                      )
-
-        cuda.Context.synchronize()
-
-        if quant.iso == 0:
-            opac_interpol(quant.dev_T_int,
-                          quant.dev_ktemp,
-                          quant.dev_p_int,
-                          quant.dev_kpress,
-                          quant.dev_opac_k,
-                          quant.dev_opac_wg_int,
-                          quant.dev_opac_scat_cross,
-                          quant.dev_scat_cross_int,
-                          quant.npress,
-                          quant.ntemp,
-                          quant.ny,
-                          quant.nbin,
-                          quant.fake_opac,
-                          quant.ninterface,
-                          block=(16, 16, 1),
-                          grid=((int(quant.nbin) + 15) // 16,
-                                (int(quant.ninterface) + 15) // 16, 1)
-                          )
-
-        cuda.Context.synchronize()
-
-    def interpolate_meanmolmass(self, quant):
-        """ interpolates the mean molecular mass values from the k-table to the atmospheric layer values """
-
-        mmm_interpol = self.mod.get_function("meanmolmass_interpol")
-        mmm_interpol(quant.dev_T_lay,
-                     quant.dev_ktemp,
-                     quant.dev_meanmolmass_lay,
-                     quant.dev_opac_meanmass,
-                     quant.dev_p_lay,
-                     quant.dev_kpress,
-                     quant.npress,
-                     quant.ntemp,
-                     quant.nlayer,
-                     block=(16, 1, 1),
-                     grid=((int(quant.nlayer) + 15) // 16, 1, 1)
-                     )
-
-        cuda.Context.synchronize()
-
-        if quant.iso == 0:
-
-            mmm_interpol(quant.dev_T_int,
-                         quant.dev_ktemp,
-                         quant.dev_meanmolmass_int,
-                         quant.dev_opac_meanmass,
-                         quant.dev_p_int,
-                         quant.dev_kpress,
-                         quant.npress,
-                         quant.ntemp,
-                         quant.ninterface,
-                         block=(16, 1, 1),
-                         grid=((int(quant.ninterface) + 15) // 16, 1, 1)
-                         )
-
-        cuda.Context.synchronize()
-
     def interpolate_kappa(self, quant):
 
         # changes kappa to correct format
@@ -368,61 +284,6 @@ class Compute(object):
                                       )
 
         cuda.Context.synchronize()
-
-    def normalize_cloud_scattering(self, quant):
-        """ normalizes the cloud scattering to own lognormal grey absorption """
-
-        if quant.clouds == 1:
-
-            cloud_norm = self.mod.get_function("cloud_normalization")
-
-            cloud_norm(
-                quant.dev_p_lay,
-                quant.dev_abs_cross_cloud,
-                quant.dev_cloud_opac_lay,
-                quant.dev_scat_cross_cloud,
-                quant.dev_cloud_scat_cross_lay,
-                quant.dev_scat_cross_lay,
-                quant.dev_meanmolmass_lay,
-                quant.dev_g_0_tot_lay,
-                quant.dev_g_0_cloud,
-                quant.g_0,
-                quant.cloud_opac_tot,
-                quant.cloud_press,
-                quant.cloud_width,
-                quant.nbin,
-                quant.nlayer,
-                block=(16, 16, 1),
-                grid=((int(quant.nbin) + 15) // 16,
-                      (int(quant.nlayer) + 15) // 16, 1)
-            )
-
-            cuda.Context.synchronize()
-
-            if quant.iso == 0:
-
-                cloud_norm(
-                    quant.dev_p_int,
-                    quant.dev_abs_cross_cloud,
-                    quant.dev_cloud_opac_int,
-                    quant.dev_scat_cross_cloud,
-                    quant.dev_cloud_scat_cross_int,
-                    quant.dev_scat_cross_int,
-                    quant.dev_meanmolmass_int,
-                    quant.dev_g_0_tot_int,
-                    quant.dev_g_0_cloud,
-                    quant.g_0,
-                    quant.cloud_opac_tot,
-                    quant.cloud_press,
-                    quant.cloud_width,
-                    quant.nbin,
-                    quant.ninterface,
-                    block=(16, 16, 1),
-                    grid=((int(quant.nbin) + 15) // 16,
-                          (int(quant.ninterface) + 15) // 16, 1)
-                )
-
-                cuda.Context.synchronize()
 
     def calculate_transmission(self, quant):
         """ calculates the transmission function in each layer for separate analysis """
@@ -863,19 +724,12 @@ class Compute(object):
                 quant.dev_F_down_tot.ptr,
                 quant.dev_T_lay.ptr,
                 quant.dev_T_int,
-                # quant.dev_ktemp.ptr,
                 quant.dev_p_lay.ptr,
                 quant.dev_p_int.ptr,
-                # quant.dev_kpress.ptr,
-                # quant.dev_opac_k.ptr,
                 quant.dev_opac_wg_lay,
                 quant.dev_opac_wg_int,
-                # quant.dev_opac_scat_cross.ptr,
-                quant.dev_scat_cross_lay.ptr,
-                quant.dev_scat_cross_int,
                 quant.dev_meanmolmass_lay.ptr,
                 quant.dev_meanmolmass_int,
-                # quant.dev_opac_meanmass.ptr,
                 quant.dev_opac_kappa.ptr,
                 quant.dev_entr_temp.ptr,
                 quant.dev_entr_press.ptr,
@@ -886,9 +740,6 @@ class Compute(object):
                 quant.nlayer,
                 quant.iter_value,
                 quant.real_star,
-                # quant.npress,
-                # quant.ntemp,
-                # quant.ny,
                 quant.entr_npress,
                 quant.entr_ntemp,
                 quant.fake_opac,
@@ -906,8 +757,6 @@ class Compute(object):
             if interp_and_calc_flux_step:
                 # TODO: check when that c_p is needed
                 self.calculate_c_p(quant)
-                # this not used in thor
-                self.normalize_cloud_scattering(quant)
 
                 # TODO: check - aren't a lot of those arguments internal to calculation?
                 # only useful on device calculations,maybe we don't need to have them visible here,
@@ -924,7 +773,6 @@ class Compute(object):
                                                           quant.dev_opac_wg_lay,
                                                           quant.dev_cloud_opac_lay.ptr,
                                                           quant.dev_meanmolmass_lay.ptr,
-                                                          quant.dev_scat_cross_lay.ptr,
                                                           quant.dev_cloud_scat_cross_lay.ptr,
                                                           quant.dev_w_0.ptr,
                                                           quant.dev_g_0_tot_lay.ptr,
@@ -960,8 +808,6 @@ class Compute(object):
                                                              quant.dev_cloud_opac_int.ptr,
                                                              quant.dev_meanmolmass_lay.ptr,
                                                              quant.dev_meanmolmass_int,
-                                                             quant.dev_scat_cross_lay.ptr,
-                                                             quant.dev_scat_cross_int,
                                                              quant.dev_cloud_scat_cross_lay.ptr,
                                                              quant.dev_cloud_scat_cross_int.ptr,
                                                              quant.dev_w_0_upper,
