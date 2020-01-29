@@ -113,6 +113,7 @@ def run_helios():
     computer.integrate_beamflux(keeper)
 
     # copy everything back to host and write to files
+    ##########################
     keeper.copy_device_to_host()
     nlayer = keeper.nlayer
     nbin = keeper.nbin
@@ -126,6 +127,7 @@ def run_helios():
     keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
                                              (ninterface*nbin),
                                              np.float64)
+    ##########################
 
     hsfunc.calculate_conv_flux(keeper)
     hsfunc.calc_F_ratio(keeper)

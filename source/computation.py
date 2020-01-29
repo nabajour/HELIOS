@@ -719,8 +719,6 @@ class Compute(object):
                 quant.dev_planckband_grid,
                 quant.dev_planckband_int.ptr,
                 quant.dev_starflux.ptr,
-                quant.dev_opac_interwave.ptr,
-                quant.dev_opac_deltawave.ptr,
                 quant.dev_F_down_tot.ptr,
                 quant.dev_T_lay.ptr,
                 quant.dev_T_int,
