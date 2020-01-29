@@ -77,7 +77,7 @@ def run_helios():
     keeper.allocate_on_device(Vmodder)
 
     ##########################
-    pylfrodull.init_parameters(quant.nlayer, quant.iso)
+    pylfrodull.init_parameters(keeper.nlayer, keeper.iso)
 
     pylfrodull.allocate()
     ##########################
