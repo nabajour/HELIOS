@@ -21,19 +21,22 @@
 #     <http://www.gnu.org/licenses/>.
 # ==============================================================================
 
-
-from source import read
-from source import quantities as quant
-from source import host_functions as hsfunc
-from source import write
-from source import computation as comp
-from source import realtime_plotting as rt_plot
-from source import clouds
 from source import Vcoupling_modification as Vmod
+from source import clouds
+from source import realtime_plotting as rt_plot
+from source import computation as comp
+from source import write
+from source import host_functions as hsfunc
+from source import quantities as quant
+from source import read
+import sys
+sys.path.append("/home/nab/prog/astro/unibe/THOR-dev/Alfrodull/build/")
+import pylfrodull  # noqa
 
 
 def run_helios():
     """ runs a normal HELIOS run with standard I/O """
+    pylfrodull.init_alfrodull()
 
     reader = read.Read()
     keeper = quant.Store()
@@ -128,6 +131,8 @@ def run_helios():
     if Vmodder.V_coupling == 1:
         Vmodder.test_coupling_convergence(keeper)
 
+    pylfrodull.deinit_alfrodull()
+
 
 def main():
     """ runs the HELIOS RT computation if this file is executed """
@@ -135,5 +140,6 @@ def main():
     if __name__ == "__main__":
 
         run_helios()
+
 
 main()
