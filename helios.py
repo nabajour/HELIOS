@@ -118,12 +118,13 @@ def run_helios():
     nbin = keeper.nbin
     ninterface = keeper.ninterface
 
+    print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
     keeper.scat_cross_lay = cuda.from_device(dev_scat_cross_section_lay_ptr,
-                                             nlayer*nbin,
+                                             (nlayer*nbin),
                                              np.float64)
-
+    print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
     keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
-                                             ninterface*nbin,
+                                             (ninterface*nbin),
                                              np.float64)
 
     hsfunc.calculate_conv_flux(keeper)
