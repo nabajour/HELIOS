@@ -460,6 +460,7 @@ __global__ void calc_surface_planck(
 }
 
 // calculates the planck function for given surface temperature
+// Note: US: note used
 __global__ void calc_surface_planck_sampling(
     utype* planckband_lay, 
     utype* lambda,

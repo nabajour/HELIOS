@@ -155,9 +155,9 @@ class Compute(object):
 
         temp_inter = self.mod.get_function("temp_inter")
 
-        temp_inter(quant.dev_T_lay,
-                   quant.dev_T_int,
-                   quant.ninterface,
+        temp_inter(quant.dev_T_lay,   # in
+                   quant.dev_T_int,   # out
+                   quant.ninterface,  # in
                    block=(16, 1, 1),
                    grid=((int(quant.ninterface)+15) // 16, 1, 1)
                    )
@@ -169,14 +169,14 @@ class Compute(object):
 
         opac_interpol = self.mod.get_function("opac_interpol")
 
-        opac_interpol(quant.dev_T_lay,
-                      quant.dev_ktemp,
-                      quant.dev_p_lay,
-                      quant.dev_kpress,
-                      quant.dev_opac_k,
-                      quant.dev_opac_wg_lay,
-                      quant.dev_opac_scat_cross,
-                      quant.dev_scat_cross_lay,
+        opac_interpol(quant.dev_T_lay,  # in, layer temp
+                      quant.dev_ktemp,  # in, ref temp
+                      quant.dev_p_lay,  # in, layer press
+                      quant.dev_kpress,  # in, ref press
+                      quant.dev_opac_k,  # in, ref opacity
+                      quant.dev_opac_wg_lay,  # out, opacities
+                      quant.dev_opac_scat_cross,  # in, ref scat cross sect
+                      quant.dev_scat_cross_lay,  # out, scat cross sect
                       quant.npress,
                       quant.ntemp,
                       quant.ny,
@@ -863,19 +863,19 @@ class Compute(object):
                 quant.dev_F_down_tot.ptr,
                 quant.dev_T_lay.ptr,
                 quant.dev_T_int,
-                quant.dev_ktemp.ptr,
+                # quant.dev_ktemp.ptr,
                 quant.dev_p_lay.ptr,
                 quant.dev_p_int.ptr,
-                quant.dev_kpress.ptr,
-                quant.dev_opac_k.ptr,
+                # quant.dev_kpress.ptr,
+                # quant.dev_opac_k.ptr,
                 quant.dev_opac_wg_lay,
                 quant.dev_opac_wg_int,
-                quant.dev_opac_scat_cross.ptr,
+                # quant.dev_opac_scat_cross.ptr,
                 quant.dev_scat_cross_lay.ptr,
                 quant.dev_scat_cross_int,
                 quant.dev_meanmolmass_lay.ptr,
                 quant.dev_meanmolmass_int,
-                quant.dev_opac_meanmass.ptr,
+                # quant.dev_opac_meanmass.ptr,
                 quant.dev_opac_kappa.ptr,
                 quant.dev_entr_temp.ptr,
                 quant.dev_entr_press.ptr,
@@ -886,9 +886,9 @@ class Compute(object):
                 quant.nlayer,
                 quant.iter_value,
                 quant.real_star,
-                quant.npress,
-                quant.ntemp,
-                quant.ny,
+                # quant.npress,
+                # quant.ntemp,
+                # quant.ny,
                 quant.entr_npress,
                 quant.entr_ntemp,
                 quant.fake_opac,
