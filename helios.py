@@ -106,10 +106,55 @@ def run_helios():
      dev_deltawave_ptr) = pylfrodull.get_dev_pointers()
 
     ##########################
+    # TODO: understand these
+    # calculates the transmission function in each layer
+    # parameters: (or same with uper and lower in noniso case)
+    # quant.dev_trans_wg,
+    # quant.dev_trans_band,
+    # quant.dev_delta_tau_wg,
+    # quant.dev_delta_tau_band,
+    # quant.dev_gauss_weight,
+
     computer.integrate_optdepth_transmission(keeper)
+    #  calculate the transmission weighting function and the contribution function for each layer and waveband
+    # parameters: (or same with uper and lower in noniso case)
+    # quant.dev_trans_wg,
+    # quant.dev_trans_weight_band,
+    # quant.dev_contr_func_band,
+    # quant.dev_gauss_weight,
+    # quant.dev_planckband_lay,
+    # quant.epsi,
     computer.calculate_contribution_function(keeper)
+
+    # (quant.dev_T_lay,
+    # quant.dev_entr_temp,
+    # quant.dev_p_lay,
+    # quant.dev_entr_press,
+    # quant.dev_entropy_lay,
+    # quant.dev_opac_entropy,
+    # quant.entr_npress,
+    # quant.entr_ntemp,
     computer.interpolate_entropy(keeper)
+    # calculates the atmospheric Planck and Rosseland mean opacities
+    # quant.dev_planck_opac_T_pl,
+    # quant.dev_ross_opac_T_pl,
+    # quant.dev_planck_opac_T_star,
+    # quant.dev_ross_opac_T_star,
+    # quant.dev_opac_wg_lay,
+    # quant.dev_cloud_opac_lay,
+    # quant.dev_planckband_lay,
+    # quant.dev_opac_interwave,
+    # quant.dev_opac_deltawave,
+    # quant.dev_T_lay,
+    # quant.dev_gauss_weight,
+    # quant.dev_opac_y,
+    # quant.dev_opac_band_lay,
     computer.calculate_mean_opacities(keeper)
+    # integrates the spectral direct beam flux first over each bin and then the whole spectral range
+    # (quant.dev_F_dir_tot,
+    # quant.dev_F_dir_band,
+    # quant.dev_opac_deltawave,
+    # quant.dev_gauss_weight,
     computer.integrate_beamflux(keeper)
 
     # copy everything back to host and write to files

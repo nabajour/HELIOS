@@ -2319,30 +2319,30 @@ __global__ void calc_contr_func_iso(
         int     ny
 ){
 
-    int x = threadIdx.x + blockIdx.x*blockDim.x;
-    int i = threadIdx.y + blockIdx.y*blockDim.y;
+  int x = threadIdx.x + blockIdx.x*blockDim.x; // wavelength bin
+  int i = threadIdx.y + blockIdx.y*blockDim.y; // layer
+  
+  if (x < nbin && i < nlayer){
     
-    if (x < nbin && i < nlayer){
-
-        utype *trans_weight_wg;
-        trans_weight_wg = new utype[ny];
-        
-        for(int y=0;y<ny;y++){
-
-            utype trans_to_top = 1.0;
+    utype *trans_weight_wg;
+    trans_weight_wg = new utype[ny];
+    
+    for(int y=0;y<ny;y++){  // loop on gaussian point
+      
+      utype trans_to_top = 1.0;
             
-            for (int j = i+1; j < nlayer; j++){
-                trans_to_top = trans_to_top * trans_wg[y+ny*x+ny*nbin*j];
-            }
-
-            trans_weight_wg[y] = (1.0 - trans_wg[y+ny*x+ny*nbin*i]) * trans_to_top;
-
-            trans_weight_band[x+nbin*i] += 0.5 * gauss_weight[y] * trans_weight_wg[y];
-        }
-        contr_func_band[x+nbin*i] = 2.0 * PI * epsi * planckband_lay[i+x*(nlayer+2)] * trans_weight_band[x+nbin*i];
-        
-        delete [] trans_weight_wg;
+      for (int j = i+1; j < nlayer; j++){
+	trans_to_top = trans_to_top * trans_wg[y+ny*x+ny*nbin*j];
+      }
+      
+      trans_weight_wg[y] = (1.0 - trans_wg[y+ny*x+ny*nbin*i]) * trans_to_top;
+      
+      trans_weight_band[x+nbin*i] += 0.5 * gauss_weight[y] * trans_weight_wg[y];
     }
+    contr_func_band[x+nbin*i] = 2.0 * PI * epsi * planckband_lay[i+x*(nlayer+2)] * trans_weight_band[x+nbin*i];
+    
+    delete [] trans_weight_wg;
+  }
 }
 
 
@@ -2389,24 +2389,24 @@ __global__ void calc_contr_func_noniso(
 
 // calculates the Planck and Rosseland mean opacities for each layer
 __global__ void calc_mean_opacities(
-        utype* planck_opac_T_pl, 
-        utype* ross_opac_T_pl,
-        utype* planck_opac_T_star, 
-        utype* ross_opac_T_star, 
-        utype* opac_wg_lay, 
-        utype* cloud_opac_lay,
-        utype* planckband_lay, 
-        utype* opac_interwave, 
-        utype* opac_deltawave, 
-        utype* T_lay, 
-        utype* gauss_weight, 
-        utype* opac_y,
-        utype* opac_band_lay, 
-        int 	nlayer, 
-        int 	nbin, 
-        int 	ny, 
-        utype 	T_star
-){
+				    utype* planck_opac_T_pl, // out
+				    utype* ross_opac_T_pl, // out
+				    utype* planck_opac_T_star, // out
+				    utype* ross_opac_T_star, // out
+				    utype* opac_wg_lay, // in
+				    utype* cloud_opac_lay,// in
+				    utype* planckband_lay, // in
+				    utype* opac_interwave, // in
+				    utype* opac_deltawave, // in
+				    utype* T_lay, // in
+				    utype* gauss_weight, 
+				    utype* opac_y,
+				    utype* opac_band_lay, // out
+				    int 	nlayer, 
+				    int 	nbin, 
+				    int 	ny, 
+				    utype 	T_star
+				    ){
 
     int i = threadIdx.x + blockIdx.x*blockDim.x;
 
