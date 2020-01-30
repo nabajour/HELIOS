@@ -83,6 +83,26 @@ class Compute(object):
 
         cuda.Context.synchronize()
 
+    def correct_incident_energy(self, quant):
+        """ adjusts the incoming energy flux to obtain the correct brightness temperature of the planet"""
+
+        if quant.energy_correction == 1 and quant.T_star > 10:
+
+            corr_inc_energy = self.mod.get_function("corr_inc_energy")
+
+            corr_inc_energy(quant.dev_planckband_grid,
+                            quant.dev_starflux,
+                            quant.dev_opac_deltawave,
+                            quant.real_star,
+                            quant.nbin,
+                            quant.T_star,
+                            quant.plancktable_dim,
+                            block=(16, 1, 1),
+                            grid=((int(quant.nbin) + 15) // 16, 1, 1)
+                            )
+
+            cuda.Context.synchronize()
+
     def interpolate_entropy(self, quant):
 
         if quant.convection == 1:
