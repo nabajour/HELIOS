@@ -103,6 +103,50 @@ class Compute(object):
 
             cuda.Context.synchronize()
 
+    def interpolate_kappa(self, quant):
+
+        # changes kappa to correct format
+        if quant.kappa_manual_value == "file":
+            quant.kappa_kernel_value = quant.fl_prec(0)
+        else:
+            quant.kappa_kernel_value = quant.fl_prec(quant.kappa_manual_value)
+
+        kappa_interpol = self.mod.get_function("kappa_interpol")
+        kappa_interpol(quant.dev_T_lay,
+                       quant.dev_entr_temp,
+                       quant.dev_p_lay,
+                       quant.dev_entr_press,
+                       quant.dev_kappa_lay,
+                       quant.dev_opac_kappa,
+                       quant.entr_npress,
+                       quant.entr_ntemp,
+                       quant.nlayer,
+                       quant.kappa_kernel_value,
+                       block=(16, 1, 1),
+                       grid=((int(quant.nlayer) + 15) // 16, 1, 1)
+                       )
+
+        cuda.Context.synchronize()
+
+        if quant.iso == 0:
+
+            kappa_interpol = self.mod.get_function("kappa_interpol")
+            kappa_interpol(quant.dev_T_int,
+                           quant.dev_entr_temp,
+                           quant.dev_p_int,
+                           quant.dev_entr_press,
+                           quant.dev_kappa_int,
+                           quant.dev_opac_kappa,
+                           quant.entr_npress,
+                           quant.entr_ntemp,
+                           quant.ninterface,
+                           quant.kappa_kernel_value,
+                           block=(16, 1, 1),
+                           grid=((int(quant.ninterface) + 15) // 16, 1, 1)
+                           )
+
+            cuda.Context.synchronize()
+
     def interpolate_entropy(self, quant):
 
         if quant.convection == 1:
