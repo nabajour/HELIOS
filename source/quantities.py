@@ -363,24 +363,6 @@ class Store(object):
         self.dev_delta_tau_wg_upper = None
         self.dev_delta_tau_wg_lower = None
         self.dev_meanmolmass_int = None
-        self.dev_M_term = None
-        self.dev_N_term = None
-        self.dev_P_term = None
-        self.dev_M_upper = None
-        self.dev_N_upper = None
-        self.dev_P_upper = None
-        self.dev_M_lower = None
-        self.dev_N_lower = None
-        self.dev_P_lower = None
-        self.dev_G_plus = None
-        self.dev_G_minus = None
-        self.dev_G_plus_upper = None
-        self.dev_G_minus_upper = None
-        self.dev_G_plus_lower = None
-        self.dev_G_minus_lower = None
-        self.dev_w_0 = None
-        self.dev_w_0_upper = None
-        self.dev_w_0_lower = None
         self.dev_opac_h2o_wg_lay = None
         self.dev_opac_co2_wg_lay = None
         self.dev_opac_co_wg_lay = None
@@ -838,12 +820,6 @@ class Store(object):
         self.dev_meanmolmass_int = cuda.mem_alloc(size_ninterface)
         self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
         self.dev_trans_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_w_0 = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_M_term = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_N_term = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_P_term = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_G_plus = cuda.mem_alloc(size_nlayer_wg_nbin)
-        self.dev_G_minus = cuda.mem_alloc(size_nlayer_wg_nbin)
 
         if self.iso == 0:
             self.dev_opac_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
@@ -852,18 +828,6 @@ class Store(object):
             self.dev_delta_tau_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
             self.dev_trans_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
             self.dev_trans_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_M_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_N_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_P_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_M_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_N_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_P_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_w_0_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_w_0_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_G_plus_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_G_plus_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_G_minus_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            self.dev_G_minus_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
 
         if Vmod.V_coupling == 1:
 

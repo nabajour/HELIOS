@@ -331,25 +331,16 @@ class Compute(object):
                 quant.dev_opac_wg_int,
                 quant.dev_meanmolmass_lay.ptr,
                 quant.dev_meanmolmass_int,
-                quant.dev_opac_kappa.ptr,
-                quant.dev_entr_temp.ptr,
-                quant.dev_entr_press.ptr,
-                quant.dev_kappa_lay.ptr,
-                quant.dev_kappa_int.ptr,
                 quant.ninterface,
                 quant.nbin,
                 quant.nlayer,
                 quant.iter_value,
                 quant.real_star,
-                quant.entr_npress,
-                quant.entr_ntemp,
                 quant.fake_opac,
                 quant.T_surf,
                 quant.surf_albedo,
                 quant.plancktable_dim,
                 quant.plancktable_step,
-                use_kappa_manual,
-                kappa_kernel_value,
                 quant.iso,
                 correct_surface_emissions,
                 interp_and_calc_flux_step
@@ -357,6 +348,8 @@ class Compute(object):
 
             if interp_and_calc_flux_step:
                 # TODO: check when that c_p is needed
+                # note: used later in convection loop
+                self.interpolate_kappa(quant)
                 self.calculate_c_p(quant)
 
                 # TODO: check - aren't a lot of those arguments internal to calculation?
@@ -421,13 +414,13 @@ class Compute(object):
                 # compute beam flux
                 # self.calculate_direct_beamflux(quant)
                 iso_bool = quant.iso == 1
-                pylfrodull.pycompute_direct_beam_flux(quant.dev_F_dir_wg.ptr,
-                                                      quant.dev_Fc_dir_wg.ptr,
-                                                      quant.dev_planckband_lay.ptr,
-                                                      quant.dev_delta_tau_wg_upper,
-                                                      quant.dev_delta_tau_wg_lower,
-                                                      quant.dev_delta_tau_wg,
-                                                      quant.dev_z_lay.ptr,
+                pylfrodull.pycompute_direct_beam_flux(quant.dev_F_dir_wg.ptr,  # out
+                                                      quant.dev_Fc_dir_wg.ptr,  # out
+                                                      quant.dev_planckband_lay.ptr,  # in
+                                                      quant.dev_delta_tau_wg_upper,  # in
+                                                      quant.dev_delta_tau_wg_lower,  # in
+                                                      quant.dev_delta_tau_wg,  # in
+                                                      quant.dev_z_lay.ptr,  # in
                                                       quant.mu_star,
                                                       quant.R_planet,
                                                       quant.R_star,
