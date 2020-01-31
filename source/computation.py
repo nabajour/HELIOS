@@ -318,19 +318,18 @@ class Compute(object):
                 kappa_kernel_value = quant.fl_prec(quant.kappa_manual_value)
 
             pylfrodull.pyprepare_compute_flux(
-                quant.dev_planckband_lay.ptr,
-                quant.dev_planckband_grid,
-                quant.dev_planckband_int.ptr,
-                quant.dev_starflux.ptr,
-                quant.dev_F_down_tot.ptr,
-                quant.dev_T_lay.ptr,
-                quant.dev_T_int,
-                quant.dev_p_lay.ptr,
-                quant.dev_p_int.ptr,
-                quant.dev_opac_wg_lay,
-                quant.dev_opac_wg_int,
-                quant.dev_meanmolmass_lay.ptr,
-                quant.dev_meanmolmass_int,
+                quant.dev_planckband_lay.ptr,    # out
+                quant.dev_planckband_grid,       # in
+                quant.dev_planckband_int.ptr,    # out
+                quant.dev_starflux.ptr,          # in
+                quant.dev_T_lay.ptr,             # out
+                quant.dev_T_int,                 # in
+                quant.dev_p_lay.ptr,             # in
+                quant.dev_p_int.ptr,             # in
+                quant.dev_opac_wg_lay,           # out
+                quant.dev_opac_wg_int,           # out
+                quant.dev_meanmolmass_lay.ptr,   # out
+                quant.dev_meanmolmass_int,       # out
                 quant.ninterface,
                 quant.nbin,
                 quant.nlayer,
@@ -355,14 +354,14 @@ class Compute(object):
                 # only useful on device calculations,maybe we don't need to have them visible here,
                 # only internally in the flux module (they are not physical inputs)
                 if (quant.iso == 1):
-                    pylfrodull.pycompute_transmission_iso(quant.dev_trans_wg,
-                                                          quant.dev_delta_tau_wg,
-                                                          quant.dev_delta_colmass.ptr,
-                                                          quant.dev_opac_wg_lay,
-                                                          quant.dev_cloud_opac_lay.ptr,
-                                                          quant.dev_meanmolmass_lay.ptr,
-                                                          quant.dev_cloud_scat_cross_lay.ptr,
-                                                          quant.dev_g_0_tot_lay.ptr,
+                    pylfrodull.pycompute_transmission_iso(quant.dev_trans_wg,                 # out
+                                                          quant.dev_delta_tau_wg,             # out
+                                                          quant.dev_delta_colmass.ptr,        # in
+                                                          quant.dev_opac_wg_lay,              # in
+                                                          quant.dev_cloud_opac_lay.ptr,       # in
+                                                          quant.dev_meanmolmass_lay.ptr,      # in
+                                                          quant.dev_cloud_scat_cross_lay.ptr,  # in
+                                                          quant.dev_g_0_tot_lay.ptr,          # in
                                                           quant.g_0,
                                                           quant.epsi,
                                                           quant.mu_star,
@@ -373,22 +372,23 @@ class Compute(object):
                                                           quant.clouds,
                                                           quant.scat_corr)
                 else:
-                    pylfrodull.pycompute_transmission_noniso(quant.dev_trans_wg_upper,
-                                                             quant.dev_trans_wg_lower,
-                                                             quant.dev_delta_tau_wg_upper,
-                                                             quant.dev_delta_tau_wg_lower,
-                                                             quant.dev_delta_col_upper,
-                                                             quant.dev_delta_col_lower,
-                                                             quant.dev_opac_wg_lay,
-                                                             quant.dev_opac_wg_int,
-                                                             quant.dev_cloud_opac_lay.ptr,
-                                                             quant.dev_cloud_opac_int.ptr,
-                                                             quant.dev_meanmolmass_lay.ptr,
-                                                             quant.dev_meanmolmass_int,
-                                                             quant.dev_cloud_scat_cross_lay.ptr,
-                                                             quant.dev_cloud_scat_cross_int.ptr,
-                                                             quant.dev_g_0_tot_lay.ptr,
-                                                             quant.dev_g_0_tot_int.ptr,
+                    # in/out extrapolated from above
+                    pylfrodull.pycompute_transmission_noniso(quant.dev_trans_wg_upper,           # out
+                                                             quant.dev_trans_wg_lower,           # out
+                                                             quant.dev_delta_tau_wg_upper,       # out
+                                                             quant.dev_delta_tau_wg_lower,       # out
+                                                             quant.dev_delta_col_upper,          # in
+                                                             quant.dev_delta_col_lower,          # in
+                                                             quant.dev_opac_wg_lay,              # in
+                                                             quant.dev_opac_wg_int,              # in
+                                                             quant.dev_cloud_opac_lay.ptr,       # in
+                                                             quant.dev_cloud_opac_int.ptr,       # in
+                                                             quant.dev_meanmolmass_lay.ptr,      # in
+                                                             quant.dev_meanmolmass_int,          # in
+                                                             quant.dev_cloud_scat_cross_lay.ptr,  # in
+                                                             quant.dev_cloud_scat_cross_int.ptr,  # in
+                                                             quant.dev_g_0_tot_lay.ptr,          # in
+                                                             quant.dev_g_0_tot_int.ptr,          # in
                                                              quant.g_0,
                                                              quant.epsi,
                                                              quant.mu_star,
@@ -413,13 +413,13 @@ class Compute(object):
                 # compute beam flux
                 # self.calculate_direct_beamflux(quant)
                 iso_bool = quant.iso == 1
-                pylfrodull.pycompute_direct_beam_flux(quant.dev_F_dir_wg.ptr,  # out
-                                                      quant.dev_Fc_dir_wg.ptr,  # out
+                pylfrodull.pycompute_direct_beam_flux(quant.dev_F_dir_wg.ptr,        # out
+                                                      quant.dev_Fc_dir_wg.ptr,       # out
                                                       quant.dev_planckband_lay.ptr,  # in
                                                       quant.dev_delta_tau_wg_upper,  # in
                                                       quant.dev_delta_tau_wg_lower,  # in
-                                                      quant.dev_delta_tau_wg,  # in
-                                                      quant.dev_z_lay.ptr,  # in
+                                                      quant.dev_delta_tau_wg,        # in
+                                                      quant.dev_z_lay.ptr,           # in
                                                       quant.mu_star,
                                                       quant.R_planet,
                                                       quant.R_star,
@@ -441,12 +441,12 @@ class Compute(object):
             for scat_iter in range(nscat_step * quant.scat + 1):
                 if iso_bool:
 
-                    pylfrodull.pypopulate_spectral_flux_iso(quant.dev_F_down_wg.ptr,
-                                                            quant.dev_F_up_wg.ptr,
-                                                            quant.dev_F_dir_wg.ptr,
-                                                            quant.dev_planckband_lay.ptr,
-                                                            quant.dev_delta_tau_wg,
-                                                            quant.dev_g_0_tot_lay.ptr,
+                    pylfrodull.pypopulate_spectral_flux_iso(quant.dev_F_down_wg.ptr,        # out
+                                                            quant.dev_F_up_wg.ptr,          # out
+                                                            quant.dev_F_dir_wg.ptr,         # in
+                                                            quant.dev_planckband_lay.ptr,   # in
+                                                            quant.dev_delta_tau_wg,         # in
+                                                            quant.dev_g_0_tot_lay.ptr,      # in
                                                             quant.g_0,
                                                             quant.singlewalk,
                                                             quant.R_star,
@@ -462,18 +462,18 @@ class Compute(object):
                                                             quant.clouds,
                                                             quant.surf_albedo)
                 else:
-                    pylfrodull.pypopulate_spectral_flux_noniso(quant.dev_F_down_wg.ptr,
-                                                               quant.dev_F_up_wg.ptr,
-                                                               quant.dev_Fc_down_wg.ptr,
-                                                               quant.dev_Fc_up_wg.ptr,
-                                                               quant.dev_F_dir_wg.ptr,
-                                                               quant.dev_Fc_dir_wg.ptr,
-                                                               quant.dev_planckband_lay.ptr,
-                                                               quant.dev_planckband_int.ptr,
-                                                               quant.dev_delta_tau_wg_upper,
-                                                               quant.dev_delta_tau_wg_lower,
-                                                               quant.dev_g_0_tot_lay.ptr,
-                                                               quant.dev_g_0_tot_int.ptr,
+                    pylfrodull.pypopulate_spectral_flux_noniso(quant.dev_F_down_wg.ptr,        # out
+                                                               quant.dev_F_up_wg.ptr,          # out
+                                                               quant.dev_Fc_down_wg.ptr,       # out
+                                                               quant.dev_Fc_up_wg.ptr,         # out
+                                                               quant.dev_F_dir_wg.ptr,         # in
+                                                               quant.dev_Fc_dir_wg.ptr,        # in
+                                                               quant.dev_planckband_lay.ptr,   # in
+                                                               quant.dev_planckband_int.ptr,   # in
+                                                               quant.dev_delta_tau_wg_upper,   # in
+                                                               quant.dev_delta_tau_wg_lower,   # in
+                                                               quant.dev_g_0_tot_lay.ptr,      # in
+                                                               quant.dev_g_0_tot_int.ptr,      # in
                                                                quant.g_0,
                                                                quant.singlewalk,
                                                                quant.R_star,
@@ -494,17 +494,17 @@ class Compute(object):
 
             #            self.populate_spectral_flux(quant)
             #            self.integrate_flux(quant)
-            pylfrodull.integrate_flux(quant.dev_opac_deltawave.ptr,
-                                      quant.dev_F_down_tot.ptr,
-                                      quant.dev_F_up_tot.ptr,
-                                      quant.dev_F_net.ptr,
-                                      quant.dev_F_down_wg.ptr,
-                                      quant.dev_F_up_wg.ptr,
-                                      quant.dev_F_dir_wg.ptr,
-                                      quant.dev_F_down_band.ptr,
-                                      quant.dev_F_up_band.ptr,
-                                      quant.dev_F_dir_band.ptr,
-                                      quant.dev_gauss_weight.ptr,
+            pylfrodull.integrate_flux(quant.dev_opac_deltawave.ptr,  # in
+                                      quant.dev_F_down_tot.ptr,      # out
+                                      quant.dev_F_up_tot.ptr,        # out
+                                      quant.dev_F_net.ptr,           # out
+                                      quant.dev_F_down_wg.ptr,       # in
+                                      quant.dev_F_up_wg.ptr,         # in
+                                      quant.dev_F_dir_wg.ptr,        # in
+                                      quant.dev_F_down_band.ptr,     # out
+                                      quant.dev_F_up_band.ptr,       # out
+                                      quant.dev_F_dir_band.ptr,      # out
+                                      quant.dev_gauss_weight.ptr,    # in
                                       quant.nbin,
                                       quant.ninterface,
                                       quant.ny,
