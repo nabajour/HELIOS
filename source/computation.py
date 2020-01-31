@@ -334,7 +334,6 @@ class Compute(object):
                 quant.ninterface,
                 quant.nbin,
                 quant.nlayer,
-                quant.iter_value,
                 quant.real_star,
                 quant.fake_opac,
                 quant.T_surf,
