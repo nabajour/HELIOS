@@ -39,29 +39,29 @@ class Compute(object):
         self.kernels = self.kernel_file.read()
         self.mod = SourceModule(self.kernels)
 
-    def construct_planck_table(self, quant):
-        """ constructs the Planck table """
+    # def construct_planck_table(self, quant):
+    #     """ constructs the Planck table """
 
-        # constructs the planck table
-        plancktable = self.mod.get_function("plancktable")
+    #     # constructs the planck table
+    #     plancktable = self.mod.get_function("plancktable")
 
-        # iteration over smaller kernels instead of one big to prevent kernel timeouts.
-        for p_iter in range(0, 10):
+    #     # iteration over smaller kernels instead of one big to prevent kernel timeouts.
+    #     for p_iter in range(0, 10):
 
-            plancktable(quant.dev_planckband_grid,
-                        quant.dev_opac_interwave,
-                        quant.dev_opac_deltawave,
-                        quant.nbin,
-                        quant.T_star,
-                        np.int32(p_iter),
-                        quant.plancktable_dim,
-                        quant.plancktable_step,
-                        block=(16, 16, 1),
-                        grid=((int(quant.nbin) + 15) // 16,
-                              (int(quant.plancktable_dim/10 + 1) + 15) // 16, 1)
-                        )
+    #         plancktable(quant.dev_planckband_grid,
+    #                     quant.dev_opac_interwave,
+    #                     quant.dev_opac_deltawave,
+    #                     quant.nbin,
+    #                     quant.T_star,
+    #                     np.int32(p_iter),
+    #                     quant.plancktable_dim,
+    #                     quant.plancktable_step,
+    #                     block=(16, 16, 1),
+    #                     grid=((int(quant.nbin) + 15) // 16,
+    #                           (int(quant.plancktable_dim/10 + 1) + 15) // 16, 1)
+    #                     )
 
-        cuda.Context.synchronize()
+    #     cuda.Context.synchronize()
 
     def construct_grid(self, quant):
         """ constructs the atmospheric grid """
@@ -318,9 +318,6 @@ class Compute(object):
                 kappa_kernel_value = quant.fl_prec(quant.kappa_manual_value)
 
             pylfrodull.pyprepare_compute_flux(
-                quant.dev_planckband_lay.ptr,    # out
-                quant.dev_planckband_grid,       # in
-                quant.dev_planckband_int.ptr,    # out
                 quant.dev_starflux.ptr,          # in
                 quant.dev_T_lay.ptr,             # out
                 quant.dev_T_int,                 # in
@@ -337,8 +334,6 @@ class Compute(object):
                 quant.fake_opac,
                 quant.T_surf,
                 quant.surf_albedo,
-                quant.plancktable_dim,
-                quant.plancktable_step,
                 quant.iso,
                 correct_surface_emissions,
                 interp_and_calc_flux_step
@@ -415,7 +410,6 @@ class Compute(object):
                 iso_bool = quant.iso == 1
                 pylfrodull.pycompute_direct_beam_flux(quant.dev_F_dir_wg.ptr,        # out
                                                       quant.dev_Fc_dir_wg.ptr,       # out
-                                                      quant.dev_planckband_lay.ptr,  # in
                                                       quant.dev_delta_tau_wg_upper,  # in
                                                       quant.dev_delta_tau_wg_lower,  # in
                                                       quant.dev_delta_tau_wg,        # in
@@ -444,7 +438,6 @@ class Compute(object):
                     pylfrodull.pypopulate_spectral_flux_iso(quant.dev_F_down_wg.ptr,        # out
                                                             quant.dev_F_up_wg.ptr,          # out
                                                             quant.dev_F_dir_wg.ptr,         # in
-                                                            quant.dev_planckband_lay.ptr,   # in
                                                             quant.dev_delta_tau_wg,         # in
                                                             quant.dev_g_0_tot_lay.ptr,      # in
                                                             quant.g_0,
@@ -468,8 +461,6 @@ class Compute(object):
                                                                quant.dev_Fc_up_wg.ptr,         # out
                                                                quant.dev_F_dir_wg.ptr,         # in
                                                                quant.dev_Fc_dir_wg.ptr,        # in
-                                                               quant.dev_planckband_lay.ptr,   # in
-                                                               quant.dev_planckband_int.ptr,   # in
                                                                quant.dev_delta_tau_wg_upper,   # in
                                                                quant.dev_delta_tau_wg_lower,   # in
                                                                quant.dev_g_0_tot_lay.ptr,      # in

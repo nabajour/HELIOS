@@ -55,6 +55,37 @@ def run_helios():
     reader.read_param_file(keeper, Vmodder)
     reader.read_command_line(keeper, Vmodder)
 
+    ##########################
+    pylfrodull.init_parameters(keeper.nlayer,
+                               keeper.iso,
+                               keeper.Tstar)
+
+    pylfrodull.prepare_planck_table()
+
+    pylfrodull.allocate()
+
+    dev_scat_cross_section_lay_ptr = 0
+    dev_scat_cross_section_int_ptr = 0
+    dev_interwave_ptr = 0
+    dev_deltawave_ptr = 0
+    (dev_scat_cross_section_int_ptr,
+     dev_scat_cross_section_lay_ptr,
+     dev_interwave_ptr,
+     dev_deltawave_ptr,
+     dev_planck_lay_ptr,
+     dev_planck_int_ptr,
+     dev_planck_grid_ptr,
+     plancktable_dim,
+     plancktable_step) = pylfrodull.get_dev_pointers()
+
+    keeper.dev_planck_lay = dev_planck_lay_ptr
+    keeper.dev_planck_grid = dev_planck_grid_ptr
+
+    keeper.plancktable_dim = np.int32(plancktable_dim)
+    keeper.plancktable_step = np.int32(plancktable_step)
+
+    ##########################
+
     if Vmodder.V_coupling == 1:
         Vmodder.read_or_create_iter_count()
         Vmodder.read_species()
@@ -78,13 +109,7 @@ def run_helios():
     keeper.copy_host_to_device(Vmodder)
     keeper.allocate_on_device(Vmodder)
 
-    ##########################
-    pylfrodull.init_parameters(keeper.nlayer, keeper.iso)
-
-    pylfrodull.allocate()
-    ##########################
     # conduct the GPU core computations
-    computer.construct_planck_table(keeper)
     computer.correct_incident_energy(keeper)
     computer.construct_grid(keeper)
 
@@ -95,17 +120,7 @@ def run_helios():
 
     computer.radiation_loop(keeper, writer, plotter, Vmodder)
     computer.convection_loop(keeper, writer, plotter, Vmodder)
-    ##########################
-    dev_scat_cross_section_lay_ptr = 0
-    dev_scat_cross_section_int_ptr = 0
-    dev_interwave_ptr = 0
-    dev_deltawave_ptr = 0
-    (dev_scat_cross_section_int_ptr,
-     dev_scat_cross_section_lay_ptr,
-     dev_interwave_ptr,
-     dev_deltawave_ptr) = pylfrodull.get_dev_pointers()
 
-    ##########################
     # TODO: understand these
     # calculates the transmission function in each layer
     # parameters: (or same with uper and lower in noniso case)
@@ -171,6 +186,15 @@ def run_helios():
     print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
     keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
                                              (ninterface*nbin),
+                                             np.float64)
+
+    #print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
+    keeper.planckband_int = cuda.from_device(dev_planck_int_ptr,
+                                             (ninterface*nbin),
+                                             np.float64)
+    #print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
+    keeper.planckband_lay = cuda.from_device(dev_planck_lay_ptr,
+                                             ((nlayer+2)*nbin),
                                              np.float64)
     ##########################
 

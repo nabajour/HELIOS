@@ -108,9 +108,9 @@ class Store(object):
         self.planet_type = None
         self.F_sens = 0
         # number of pre-tabulated temperature values for the planck table
-        self.plancktable_dim = np.int32(8000)
+        #self.plancktable_dim = np.int32(8000)
         # temperature step for the planck table. e.g. dim = 10000 and step = 2 will give a table from 1 K to 19999 K in 2 K steps
-        self.plancktable_step = np.int32(2)
+        #self.plancktable_step = np.int32(2)
 
         # arrays/lists exclusively used on the CPU
         self.T_restart = []
@@ -283,10 +283,10 @@ class Store(object):
         self.dev_p_lay = None
         self.p_int = None
         self.dev_p_int = None
-        self.planckband_lay = None
+        # self.planckband_lay = None
         self.dev_planckband_lay = None
         self.planckband_int = None
-        self.dev_planckband_int = None
+        # self.dev_planckband_int = None
         self.planck_opac_T_pl = None
         self.dev_planck_opac_T_pl = None
         self.ross_opac_T_pl = None
@@ -510,7 +510,7 @@ class Store(object):
         self.ninterface_wg_nbin = np.int32(
             self.ninterface * self.ny * self.nbin)
         self.nlayer_wg_nbin = np.int32(self.ninterface * self.ny * self.nbin)
-        self.nplanck_grid = np.int32((self.plancktable_dim+1) * self.nbin)
+        #self.nplanck_grid = np.int32((self.plancktable_dim+1) * self.nbin)
 
     def create_zero_arrays(self, Vmod):
         """ creates zero arrays of quantities to be used on the GPU with the correct length/dimension """
@@ -534,8 +534,8 @@ class Store(object):
         self.F_net_diff = np.zeros(self.nlayer, self.fl_prec)
         self.p_lay = np.zeros(self.nlayer, self.fl_prec)
         self.p_int = np.zeros(self.ninterface, self.fl_prec)
-        self.planckband_lay = np.zeros(self.nlayer_plus2_nbin, self.fl_prec)
-        self.planckband_int = np.zeros(self.ninterface_nbin, self.fl_prec)
+        #self.planckband_lay = np.zeros(self.nlayer_plus2_nbin, self.fl_prec)
+        #self.planckband_int = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.planck_opac_T_pl = np.zeros(self.nlayer, self.fl_prec)
         self.ross_opac_T_pl = np.zeros(self.nlayer, self.fl_prec)
         self.planck_opac_T_star = np.zeros(self.nlayer, self.fl_prec)
@@ -683,12 +683,12 @@ class Store(object):
         self.dev_F_down_tot = gpuarray.to_gpu(self.F_down_tot)
         self.dev_F_dir_tot = gpuarray.to_gpu(self.F_dir_tot)
         self.dev_opac_band_lay = gpuarray.to_gpu(self.opac_band_lay)
-#        self.dev_scat_cross_lay = gpuarray.to_gpu(self.scat_cross_lay)
+        #        self.dev_scat_cross_lay = gpuarray.to_gpu(self.scat_cross_lay)
         self.dev_F_net = gpuarray.to_gpu(self.F_net)
         self.dev_F_net_diff = gpuarray.to_gpu(self.F_net_diff)
         self.dev_p_lay = gpuarray.to_gpu(self.p_lay)
         self.dev_p_int = gpuarray.to_gpu(self.p_int)
-        self.dev_planckband_lay = gpuarray.to_gpu(self.planckband_lay)
+        #        self.dev_planckband_lay = gpuarray.to_gpu(self.planckband_lay)
         self.dev_planck_opac_T_pl = gpuarray.to_gpu(self.planck_opac_T_pl)
         self.dev_ross_opac_T_pl = gpuarray.to_gpu(self.ross_opac_T_pl)
         self.dev_planck_opac_T_star = gpuarray.to_gpu(self.planck_opac_T_star)
@@ -729,7 +729,7 @@ class Store(object):
         # self.dev_contr_cloud = gpuarray.to_gpu(self.contr_cloud)
 
         if self.iso == 0:
-            self.dev_planckband_int = gpuarray.to_gpu(self.planckband_int)
+            # self.dev_planckband_int = gpuarray.to_gpu(self.planckband_int)
             self.dev_Fc_down_wg = gpuarray.to_gpu(self.Fc_down_wg)
             self.dev_Fc_up_wg = gpuarray.to_gpu(self.Fc_up_wg)
             self.dev_Fc_dir_wg = gpuarray.to_gpu(self.Fc_dir_wg)
@@ -754,7 +754,7 @@ class Store(object):
         self.p_lay = self.dev_p_lay.get()
         self.p_int = self.dev_p_int.get()
         self.T_lay = self.dev_T_lay.get()
-        self.planckband_lay = self.dev_planckband_lay.get()
+        # self.planckband_lay = self.dev_planckband_lay.get()
         self.planck_opac_T_pl = self.dev_planck_opac_T_pl.get()
         self.ross_opac_T_pl = self.dev_ross_opac_T_pl.get()
         self.planck_opac_T_star = self.dev_planck_opac_T_star.get()
@@ -790,8 +790,8 @@ class Store(object):
         # self.contr_rayleigh = self.dev_contr_rayleigh.get()
         # self.contr_cloud = self.dev_contr_cloud.get()
 
-        if self.iso == 0:
-            self.planckband_int = self.dev_planckband_int.get()
+        #        if self.iso == 0:
+        #            self.planckband_int = self.dev_planckband_int.get()
 
     def allocate_on_device(self, Vmod):
         """ allocate memory for arrays existing only on the GPU """
@@ -806,7 +806,6 @@ class Store(object):
         size_ninterface_nbin = int(self.ninterface_nbin * self.nr_bytes)
         size_nlayer_wg_nbin = int(self.nlayer_wg_nbin * self.nr_bytes)
         size_ninterface_wg_nbin = int(self.ninterface_wg_nbin * self.nr_bytes)
-        size_nplanckgrid = int(self.nplanck_grid * self.nr_bytes)
 
         # these arrays will never be copied between host and device.
         # Hence the normal mem_alloc functionality
@@ -815,7 +814,6 @@ class Store(object):
         self.dev_delta_col_lower = cuda.mem_alloc(size_nlayer)
         self.dev_delta_t_prefactor = cuda.mem_alloc(size_nlayer)
         self.dev_T_store = cuda.mem_alloc(size_nlayer)
-        self.dev_planckband_grid = cuda.mem_alloc(size_nplanckgrid)
         self.dev_opac_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
         self.dev_meanmolmass_int = cuda.mem_alloc(size_ninterface)
         self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
