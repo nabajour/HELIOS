@@ -135,7 +135,8 @@ class Read(object):
 
         if yes_to_change == 1:
 
-            os.rename("./source/kernels.cu", "./backup/kernels_backup/kernels.cu.backup.{:.0f}".format(datetime.datetime.now().timestamp()))
+            os.rename("./source/kernels.cu", "./backup/kernels_backup/kernels.cu.backup.{:.0f}".format(
+                datetime.datetime.now().timestamp()))
 
             with open("./source/kernels.cu", "w") as cudafile:
                 contents = "".join(contents)
@@ -143,7 +144,6 @@ class Read(object):
 
             os.system("python3 helios.py")  # recompile and restart program
             raise SystemExit()  # prevent old program from resuming at the end
-
 
     def read_param_file(self, quant, Vmod):
         """ reads the input file """
@@ -162,7 +162,8 @@ class Read(object):
                             self.set_precision(quant)
                             self.set_prec_in_cudafile(quant)
                         elif column[0] == "realtime":
-                            quant.realtime_plot, quant.n_plot = self.set_realtime_plotting(column[3])
+                            quant.realtime_plot, quant.n_plot = self.set_realtime_plotting(
+                                column[3])
 
                         # GRID
                         elif column[0] == "isothermal":
@@ -186,7 +187,8 @@ class Read(object):
                             self.temp_format = column[7]
                             self.temp_pressure_unit = column[8]
                         elif column[0] == "varying":
-                            quant.varying_tstep = self.__read_yes_no__(column[3])
+                            quant.varying_tstep = self.__read_yes_no__(
+                                column[3])
                         elif column[0] == "timestep":
                             quant.tstep = quant.fl_prec(column[3])
                         elif column[0] == "adaptive" and column[1] == "interval":
@@ -213,10 +215,13 @@ class Read(object):
                         elif column[0] == "f" and column[1] == "factor":
                             quant.f_factor = quant.fl_prec(column[3])
                         elif column[0] == "stellar" and column[1] == "zenith":
-                            quant.dir_angle = quant.fl_prec((180 - float(column[5])) * npy.pi / 180.0)
-                            quant.mu_star = quant.fl_prec(npy.cos(quant.dir_angle))
+                            quant.dir_angle = quant.fl_prec(
+                                (180 - float(column[5])) * npy.pi / 180.0)
+                            quant.mu_star = quant.fl_prec(
+                                npy.cos(quant.dir_angle))
                         elif column[0] == "geom." and column[1] == "zenith":
-                            quant.geom_zenith_corr = self.__read_yes_no__(column[5])
+                            quant.geom_zenith_corr = self.__read_yes_no__(
+                                column[5])
                         elif column[0] == "internal" and column[1] == "temperature":
                             quant.T_intern = quant.fl_prec(column[4])
                         elif column[0] == "surface" and column[1] == "temperature":
@@ -224,11 +229,14 @@ class Read(object):
                         elif column[0] == "asymmetry":
                             quant.g_0 = quant.fl_prec(column[4])
                         elif column[0] == "energy" and column[2] == "correction":
-                            quant.energy_correction = self.__read_yes_no__(column[4])
+                            quant.energy_correction = self.__read_yes_no__(
+                                column[4])
                         elif column[0] == "surface" and column[1] == "albedo":
                             quant.surf_albedo = quant.fl_prec(column[3])
-                            quant.surf_albedo = min(0.999, quant.surf_albedo)  # everything above 0.999 albedo is not physical. fullstop.
-                            quant.surf_albedo = quant.fl_prec(quant.surf_albedo)
+                            # everything above 0.999 albedo is not physical. fullstop.
+                            quant.surf_albedo = min(0.999, quant.surf_albedo)
+                            quant.surf_albedo = quant.fl_prec(
+                                quant.surf_albedo)
 
                         # CONVECTIVE ADJUSTMENT
                         elif column[0] == "convective":
@@ -288,7 +296,6 @@ class Read(object):
                         elif column[0] == "mixing" and column[2] == "file":
                             Vmod.mix_file = column[4]
 
-
         except IOError:
             print("ABORT - Input file not found!")
             raise SystemExit()
@@ -296,33 +303,51 @@ class Read(object):
     def read_command_line(self, quant, Vmod):
         """ reads any eventual command-line arguments"""
 
-        parser = argparse.ArgumentParser(description=
-                                         "The following are the possible command-line parameters for HELIOS")
+        parser = argparse.ArgumentParser(
+            description="The following are the possible command-line parameters for HELIOS")
 
-        parser.add_argument('-g', help='surface gravity [cm s^-2]', required=False)
+        parser.add_argument(
+            '-g', help='surface gravity [cm s^-2]', required=False)
         parser.add_argument('-a', help='orbital distance [AU]', required=False)
-        parser.add_argument('-rstar', help='stellar radius [R_sun]', required=False)
-        parser.add_argument('-tstar', help='stellar temperature [K]', required=False)
-        parser.add_argument('-tintern', help='internal flux temperature [K]', required=False)
+        parser.add_argument(
+            '-rstar', help='stellar radius [R_sun]', required=False)
+        parser.add_argument(
+            '-tstar', help='stellar temperature [K]', required=False)
+        parser.add_argument(
+            '-tintern', help='internal flux temperature [K]', required=False)
         parser.add_argument('-name', help='name of output', required=False)
-        parser.add_argument('-Viter', help='VULCAN coupling iteration step nr.', required=False)
-        parser.add_argument('-angle', help='zenith angle measured from the vertical', required=False)
-        parser.add_argument('-isothermal', help='isothermal layers?', required=False)
-        parser.add_argument('-postprocess', help='pure post-processing?', required=False)
-        parser.add_argument('-temperaturepath', help='path to the temperature file', required=False)
+        parser.add_argument(
+            '-Viter', help='VULCAN coupling iteration step nr.', required=False)
+        parser.add_argument(
+            '-angle', help='zenith angle measured from the vertical', required=False)
+        parser.add_argument(
+            '-isothermal', help='isothermal layers?', required=False)
+        parser.add_argument(
+            '-postprocess', help='pure post-processing?', required=False)
+        parser.add_argument(
+            '-temperaturepath', help='path to the temperature file', required=False)
         parser.add_argument('-plot', help='realtime plotting?', required=False)
-        parser.add_argument('-opacitypath', help='path to the opacity table file', required=False)
-        parser.add_argument('-energycorrection', help='include correction for global incoming energy?', required=False)
-        parser.add_argument('-planet', help='name of the planet to be modeled', required=False)
-        parser.add_argument('-nlayers', help='number of layers in the grid', required=False)
-        parser.add_argument('-ptoa', help='pressure at the TOA', required=False)
-        parser.add_argument('-pboa', help='pressure at the BOA', required=False)
-        parser.add_argument('-f', help='f heat redistribution factor', required=False)
+        parser.add_argument(
+            '-opacitypath', help='path to the opacity table file', required=False)
+        parser.add_argument(
+            '-energycorrection', help='include correction for global incoming energy?', required=False)
+        parser.add_argument(
+            '-planet', help='name of the planet to be modeled', required=False)
+        parser.add_argument(
+            '-nlayers', help='number of layers in the grid', required=False)
+        parser.add_argument(
+            '-ptoa', help='pressure at the TOA', required=False)
+        parser.add_argument(
+            '-pboa', help='pressure at the BOA', required=False)
+        parser.add_argument(
+            '-f', help='f heat redistribution factor', required=False)
         parser.add_argument('-tau_lw', help='tau_lw', required=False)
-        parser.add_argument('-star', help='spectral model of the star', required=False)
-        parser.add_argument('-Vfile', help='path to the file with VULCAN mixing ratios', required=False)
-        parser.add_argument('-kappa', help='adiabatic coefficient, kappa = (ln T / ln P)_S', required=False)
-
+        parser.add_argument(
+            '-star', help='spectral model of the star', required=False)
+        parser.add_argument(
+            '-Vfile', help='path to the file with VULCAN mixing ratios', required=False)
+        parser.add_argument(
+            '-kappa', help='adiabatic coefficient, kappa = (ln T / ln P)_S', required=False)
 
         args = parser.parse_args()
 
@@ -350,7 +375,8 @@ class Read(object):
             Vmod.V_iter_nr = npy.int32(args.Viter)
 
         if args.angle:
-            quant.dir_angle = quant.fl_prec((180 - float(args.angle)) * npy.pi / 180.0)
+            quant.dir_angle = quant.fl_prec(
+                (180 - float(args.angle)) * npy.pi / 180.0)
             quant.mu_star = quant.fl_prec(npy.cos(quant.dir_angle))
 
         if args.isothermal:
@@ -363,13 +389,15 @@ class Read(object):
             self.temp_path = args.temperaturepath
 
         if args.plot:
-            quant.realtime_plot, quant.n_plot = self.set_realtime_plotting(args.plot)
+            quant.realtime_plot, quant.n_plot = self.set_realtime_plotting(
+                args.plot)
 
         if args.opacitypath:
             self.ktable_path = args.opacitypath
 
         if args.energycorrection:
-            quant.energy_correction = self.__read_yes_no__(args.energycorrection)
+            quant.energy_correction = self.__read_yes_no__(
+                args.energycorrection)
 
         if args.planet:
             quant.planet = args.planet
@@ -400,7 +428,8 @@ class Read(object):
             quant.kappa_manual_value = args.kappa
 
         # now that we know the name for sure, let's do some pleasantries
-        print("\n### Welcome to HELIOS! This run has the name: " + quant.name + ". Enjoy the ride! ###")
+        print("\n### Welcome to HELIOS! This run has the name: " +
+              quant.name + ". Enjoy the ride! ###")
 
     def read_opac_file(self, quant, Vmod):
         """ reads the opacity table """
@@ -423,17 +452,21 @@ class Read(object):
                     quant.npress = npy.int32(len(quant.kpress))
 
                     # Rayleigh scattering cross-sections
-                    quant.opac_scat_cross = [c for c in opac_file["weighted Rayleigh cross-sections"][:]]
+                    quant.opac_scat_cross = [
+                        c for c in opac_file["weighted Rayleigh cross-sections"][:]]
 
                     # pre-tabulated mean molecular mass values (& convert from mu to mean mass)
-                    quant.opac_meanmass = [m * pc.AMU for m in opac_file["meanmolmass"][:]]
+                    quant.opac_meanmass = [
+                        m * pc.AMU for m in opac_file["meanmolmass"][:]]
                     # quant.opac_meanmass = [2.5 * pc.AMU for m in opac_file["meanmolmass"][:]]  # for testing
 
                     # wavelength grid
                     try:
-                        quant.opac_wave = [x for x in opac_file["center wavelengths"][:]]
+                        quant.opac_wave = [
+                            x for x in opac_file["center wavelengths"][:]]
                     except KeyError:
-                        quant.opac_wave = [x for x in opac_file["wavelengths"][:]]
+                        quant.opac_wave = [
+                            x for x in opac_file["wavelengths"][:]]
                     quant.nbin = npy.int32(len(quant.opac_wave))
 
                     # Gaussian y-points
@@ -445,23 +478,28 @@ class Read(object):
 
                     # interface positions of the wavelength bins
                     try:
-                        quant.opac_interwave = [i for i in opac_file["interface wavelengths"][:]]
+                        quant.opac_interwave = [
+                            i for i in opac_file["interface wavelengths"][:]]
                     except KeyError:
                         # quick and dirty way to get the lamda interface values
                         quant.opac_interwave = []
-                        quant.opac_interwave.append(quant.opac_wave[0] - (quant.opac_wave[1] - quant.opac_wave[0])/2)
+                        quant.opac_interwave.append(
+                            quant.opac_wave[0] - (quant.opac_wave[1] - quant.opac_wave[0])/2)
                         for x in range(len(quant.opac_wave) - 1):
-                            quant.opac_interwave.append((quant.opac_wave[x+1] + quant.opac_wave[x])/2)
-                        quant.opac_interwave.append(quant.opac_wave[-1] + (quant.opac_wave[-1] - quant.opac_wave[-2])/2)
+                            quant.opac_interwave.append(
+                                (quant.opac_wave[x+1] + quant.opac_wave[x])/2)
+                        quant.opac_interwave.append(
+                            quant.opac_wave[-1] + (quant.opac_wave[-1] - quant.opac_wave[-2])/2)
 
                     # widths of the wavelength bins
                     try:
-                        quant.opac_deltawave = [w for w in opac_file["wavelength width of bins"][:]]
+                        quant.opac_deltawave = [
+                            w for w in opac_file["wavelength width of bins"][:]]
                     except KeyError:
                         quant.opac_deltawave = []
                         for x in range(len(quant.opac_interwave) - 1):
-                            quant.opac_deltawave.append(quant.opac_interwave[x + 1] - quant.opac_interwave[x])
-
+                            quant.opac_deltawave.append(
+                                quant.opac_interwave[x + 1] - quant.opac_interwave[x])
 
             except OSError:
                 print("\nABORT - \"", self.ktable_path, "\" not found!")
@@ -486,7 +524,6 @@ class Read(object):
             #                 #if x < 275:
             #                 #    quant.opac_k[y + ny * x + ny * nx * p + ny * nx * nump * t] = min(1e-1, quant.opac_k[y + ny * x + ny * nx * p + ny * nx * nump * t])
 
-
     @staticmethod
     def __read_correct_dataset__(path, dataset, flux_list):
 
@@ -500,9 +537,10 @@ class Read(object):
 
     def read_planet_file(self, quant):
 
-        planet_data = npy.genfromtxt(self.planet_file, names=True, dtype=None, skip_header=3, delimiter=None)
+        planet_data = npy.genfromtxt(
+            self.planet_file, names=True, dtype=None, skip_header=3, delimiter=None)
 
-        first_column = npy.array(planet_data['Planet'],dtype='U')
+        first_column = npy.array(planet_data['Planet'], dtype='U')
 
         try:
             row = npy.where(first_column == quant.planet)[0][0]
@@ -514,8 +552,10 @@ class Read(object):
             quant.T_star = quant.fl_prec(planet_data['T_star'][row])
 
         except IndexError:
-            print("No planet with name", quant.planet, "found. Please make sure the name is written correctly.")
-            quant.planet = input("\nType in new planetary name or write \"abort\" to exit: \n\n\t")
+            print("No planet with name", quant.planet,
+                  "found. Please make sure the name is written correctly.")
+            quant.planet = input(
+                "\nType in new planetary name or write \"abort\" to exit: \n\n\t")
             if quant.planet == "abort":
                 print("Aborting...")
                 raise SystemExit
@@ -539,8 +579,10 @@ class Read(object):
                     for line in entr_file:
                         column = line.split()
                         if column:
-                            quant.entr_press.append(10**quant.fl_prec(column[0]))
-                            quant.entr_temp.append(10**quant.fl_prec(column[1]))
+                            quant.entr_press.append(
+                                10**quant.fl_prec(column[0]))
+                            quant.entr_temp.append(
+                                10**quant.fl_prec(column[1]))
                             entropy.append(quant.fl_prec(column[4]))
                             kappa.append(quant.fl_prec(column[5]))
             except IndexError:
@@ -551,8 +593,10 @@ class Read(object):
                     for line in entr_file:
                         column = line.split()
                         if column:
-                            quant.entr_press.append(10 ** quant.fl_prec(column[0]))
-                            quant.entr_temp.append(10 ** quant.fl_prec(column[1]))
+                            quant.entr_press.append(
+                                10 ** quant.fl_prec(column[0]))
+                            quant.entr_temp.append(
+                                10 ** quant.fl_prec(column[1]))
                             entropy.append(0)
                             kappa.append(quant.fl_prec(column[2]))
 
@@ -568,7 +612,8 @@ class Read(object):
 
                 for p in range(quant.entr_npress):
 
-                    quant.opac_entropy.append(entropy[t + quant.entr_ntemp * p])
+                    quant.opac_entropy.append(
+                        entropy[t + quant.entr_ntemp * p])
                     quant.opac_kappa.append(kappa[t + quant.entr_ntemp * p])
 
         else:
@@ -590,14 +635,17 @@ class Read(object):
                                               quant.stellar_model,
                                               quant.starflux)
                 quant.real_star = npy.int32(1)
-                print("\nReading", self.stellar_path + quant.stellar_model, "as spectral model of the host star.")
+                print("\nReading", self.stellar_path + quant.stellar_model,
+                      "as spectral model of the host star.")
 
             except KeyError:
 
-                print("\nThere is no such stellar spectrum found. Please check file path and data set.")
+                print(
+                    "\nThere is no such stellar spectrum found. Please check file path and data set.")
                 inp = None
                 while inp != "yes" and inp != "no":
-                    inp = input("\n\tProceed with blackbody flux? (yes/no) \n\n\t")
+                    inp = input(
+                        "\n\tProceed with blackbody flux? (yes/no) \n\n\t")
                     if inp == "no":
                         print("\nAborting...")
                         raise SystemExit()
@@ -635,7 +683,8 @@ class Read(object):
                         file_temp.append(quant.fl_prec(column[1]))
                         file_press.append(quant.fl_prec(column[2]))
                         try:
-                            quant.T_surf = quant.fl_prec(column[8])  # will override the value in the param.dat file
+                            # will override the value in the param.dat file
+                            quant.T_surf = quant.fl_prec(column[8])
                         except IndexError:
                             pass
 
@@ -669,9 +718,12 @@ class Read(object):
             print("Wrong format for TP-file. Aborting...")
             raise SystemExit()
 
-        own_press = [quant.p_boa * npy.exp(npy.log(quant.p_toa / quant.p_boa) * p / (quant.nlayer - 1.0)) for p in range(quant.nlayer)]
+        own_press = [quant.p_boa * npy.exp(npy.log(quant.p_toa / quant.p_boa) * p / (
+            quant.nlayer - 1.0)) for p in range(quant.nlayer)]
 
-        quant.T_restart = self.interpolate_to_own_press(file_press, file_temp, own_press)
+        quant.T_restart = self.interpolate_to_own_press(
+            file_press, file_temp, own_press)
+
 
 if __name__ == "__main__":
     print("This module is for reading stuff. "

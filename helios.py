@@ -55,14 +55,40 @@ def run_helios():
     reader.read_param_file(keeper, Vmodder)
     reader.read_command_line(keeper, Vmodder)
 
+    reader.read_star(keeper)
+    print("Tstar: ", keeper.T_star)
+
+    if Vmodder.V_coupling == 1:
+        Vmodder.read_or_create_iter_count()
+        Vmodder.read_species()
+        Vmodder.read_molecular_opacities(keeper)
+        Vmodder.read_layer_molecular_abundance(keeper)
+    reader.read_opac_file(keeper, Vmodder)
+    reader.read_entropy_table(keeper)
+    cloudy.main_cloud_method(keeper)
+    keeper.dimensions()
+
+    hsfunc.planet_param(keeper, reader)
+    hsfunc.set_up_numerical_parameters(keeper)
+    hsfunc.initial_temp(keeper, reader, Vmodder)
+    if keeper.approx_f == 1:
+        hsfunc.approx_f_from_formula(keeper)
+    hsfunc.calc_F_intern(keeper)
+
+    # get ready for GPU computations
+    keeper.create_zero_arrays(Vmodder)
+    keeper.convert_input_list_to_array(Vmodder)
+    keeper.copy_host_to_device(Vmodder)
+    keeper.allocate_on_device(Vmodder)
+
     ##########################
     pylfrodull.init_parameters(keeper.nlayer,
                                keeper.iso,
-                               keeper.Tstar)
-
-    pylfrodull.prepare_planck_table()
+                               keeper.T_star)
 
     pylfrodull.allocate()
+
+    pylfrodull.prepare_planck_table()
 
     dev_scat_cross_section_lay_ptr = 0
     dev_scat_cross_section_int_ptr = 0
@@ -78,36 +104,24 @@ def run_helios():
      plancktable_dim,
      plancktable_step) = pylfrodull.get_dev_pointers()
 
-    keeper.dev_planck_lay = dev_planck_lay_ptr
-    keeper.dev_planck_grid = dev_planck_grid_ptr
+    keeper.dev_planckband_lay = np.uint64(dev_planck_lay_ptr)
+    keeper.dev_planckband_grid = np.uint64(dev_planck_grid_ptr)
+    print("dev_planck_grid: ", dev_planck_grid_ptr)
+    print(cuda.from_device(dev_planck_grid_ptr,
+                           ((plancktable_dim+1)*323),
+                           np.float64))
 
-    keeper.plancktable_dim = np.int32(plancktable_dim)
-    keeper.plancktable_step = np.int32(plancktable_step)
+    print(cuda.from_device(dev_interwave_ptr,
+                           (323+1),
+                           np.float64))
+    print(cuda.from_device(dev_deltawave_ptr,
+                           (323),
+                           np.float64))
+
+    keeper.plancktable_dim = np.uint32(plancktable_dim)
+    keeper.plancktable_step = np.uint32(plancktable_step)
 
     ##########################
-
-    if Vmodder.V_coupling == 1:
-        Vmodder.read_or_create_iter_count()
-        Vmodder.read_species()
-        Vmodder.read_molecular_opacities(keeper)
-        Vmodder.read_layer_molecular_abundance(keeper)
-    reader.read_opac_file(keeper, Vmodder)
-    reader.read_entropy_table(keeper)
-    cloudy.main_cloud_method(keeper)
-    keeper.dimensions()
-    reader.read_star(keeper)
-    hsfunc.planet_param(keeper, reader)
-    hsfunc.set_up_numerical_parameters(keeper)
-    hsfunc.initial_temp(keeper, reader, Vmodder)
-    if keeper.approx_f == 1:
-        hsfunc.approx_f_from_formula(keeper)
-    hsfunc.calc_F_intern(keeper)
-
-    # get ready for GPU computations
-    keeper.create_zero_arrays(Vmodder)
-    keeper.convert_input_list_to_array(Vmodder)
-    keeper.copy_host_to_device(Vmodder)
-    keeper.allocate_on_device(Vmodder)
 
     # conduct the GPU core computations
     computer.correct_incident_energy(keeper)
@@ -188,11 +202,11 @@ def run_helios():
                                              (ninterface*nbin),
                                              np.float64)
 
-    #print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
+    # print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
     keeper.planckband_int = cuda.from_device(dev_planck_int_ptr,
                                              (ninterface*nbin),
                                              np.float64)
-    #print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
+    # print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
     keeper.planckband_lay = cuda.from_device(dev_planck_lay_ptr,
                                              ((nlayer+2)*nbin),
                                              np.float64)
