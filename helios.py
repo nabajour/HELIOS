@@ -111,17 +111,17 @@ def run_helios():
 
     keeper.dev_planckband_lay = np.uint64(dev_planck_lay_ptr)
     keeper.dev_planckband_grid = np.uint64(dev_planck_grid_ptr)
-    print("dev_planck_grid: ", dev_planck_grid_ptr)
-    print(cuda.from_device(dev_planck_grid_ptr,
-                           ((plancktable_dim+1)*323),
-                           np.float64))
+    # print("dev_planck_grid: ", dev_planck_grid_ptr)
+    # print(cuda.from_device(dev_planck_grid_ptr,
+    #                        ((plancktable_dim+1)*323),
+    #                        np.float64))
 
-    print(cuda.from_device(dev_interwave_ptr,
-                           (323+1),
-                           np.float64))
-    print(cuda.from_device(dev_deltawave_ptr,
-                           (323),
-                           np.float64))
+    # print(cuda.from_device(dev_interwave_ptr,
+    #                        (323+1),
+    #                        np.float64))
+    # print(cuda.from_device(dev_deltawave_ptr,
+    #                        (323),
+    #                        np.float64))
 
     keeper.plancktable_dim = np.uint32(plancktable_dim)
     keeper.plancktable_step = np.uint32(plancktable_step)
