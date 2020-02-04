@@ -89,6 +89,11 @@ def run_helios():
     pylfrodull.allocate()
 
     pylfrodull.prepare_planck_table()
+    pylfrodull.correct_incident_energy(
+        keeper.dev_starflux.ptr,
+        keeper.real_star,
+        keeper.energy_correction
+    )
 
     dev_scat_cross_section_lay_ptr = 0
     dev_scat_cross_section_int_ptr = 0
@@ -124,7 +129,7 @@ def run_helios():
     ##########################
 
     # conduct the GPU core computations
-    computer.correct_incident_energy(keeper)
+    # computer.correct_incident_energy(keeper)
     computer.construct_grid(keeper)
 
     if Vmodder.V_coupling == 1:
