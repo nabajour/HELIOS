@@ -39,30 +39,6 @@ class Compute(object):
         self.kernels = self.kernel_file.read()
         self.mod = SourceModule(self.kernels)
 
-    # def construct_planck_table(self, quant):
-    #     """ constructs the Planck table """
-
-    #     # constructs the planck table
-    #     plancktable = self.mod.get_function("plancktable")
-
-    #     # iteration over smaller kernels instead of one big to prevent kernel timeouts.
-    #     for p_iter in range(0, 10):
-
-    #         plancktable(quant.dev_planckband_grid,
-    #                     quant.dev_opac_interwave,
-    #                     quant.dev_opac_deltawave,
-    #                     quant.nbin,
-    #                     quant.T_star,
-    #                     np.int32(p_iter),
-    #                     quant.plancktable_dim,
-    #                     quant.plancktable_step,
-    #                     block=(16, 16, 1),
-    #                     grid=((int(quant.nbin) + 15) // 16,
-    #                           (int(quant.plancktable_dim/10 + 1) + 15) // 16, 1)
-    #                     )
-
-    #     cuda.Context.synchronize()
-
     def construct_grid(self, quant):
         """ constructs the atmospheric grid """
 
@@ -82,26 +58,6 @@ class Compute(object):
                    )
 
         cuda.Context.synchronize()
-
-    def correct_incident_energy(self, quant):
-        """ adjusts the incoming energy flux to obtain the correct brightness temperature of the planet"""
-
-        if quant.energy_correction == 1 and quant.T_star > 10:
-
-            corr_inc_energy = self.mod.get_function("corr_inc_energy")
-
-            corr_inc_energy(quant.dev_planckband_grid,
-                            quant.dev_starflux,
-                            quant.dev_opac_deltawave,
-                            quant.real_star,
-                            quant.nbin,
-                            quant.T_star,
-                            quant.plancktable_dim,
-                            block=(16, 1, 1),
-                            grid=((int(quant.nbin) + 15) // 16, 1, 1)
-                            )
-
-            cuda.Context.synchronize()
 
     def interpolate_kappa(self, quant):
 
