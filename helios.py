@@ -106,9 +106,15 @@ def run_helios():
      dev_planck_lay_ptr,
      dev_planck_int_ptr,
      dev_planck_grid_ptr,
+     dev_delta_tau_wg_ptr,
+     dev_delta_tau_wg_upper_ptr,
+     dev_delta_tau_wg_lower_ptr,
      plancktable_dim,
      plancktable_step) = pylfrodull.get_dev_pointers()
 
+    keeper.dev_delta_tau_wg = np.uint64(dev_delta_tau_wg_ptr)
+    keeper.dev_delta_tau_wg_upper = np.uint64(dev_delta_tau_wg_upper_ptr)
+    keeper.dev_delta_tau_wg_lower = np.uint64(dev_delta_tau_wg_lower_ptr)
     keeper.dev_planckband_lay = np.uint64(dev_planck_lay_ptr)
     keeper.dev_planckband_grid = np.uint64(dev_planck_grid_ptr)
     # print("dev_planck_grid: ", dev_planck_grid_ptr)
