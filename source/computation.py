@@ -224,7 +224,8 @@ class Compute(object):
 
         # this calculates new Z from Delta_Z (only dependencies
         hsfunc.calculate_height_z(self.quant)
-        self.quant.dev_z_lay = gpuarray.to_gpu(self.quant.z_lay)
+        self.quant.dev_z_lay.set(self.quant.z_lay)
+#        self.quant.dev_z_lay = gpuarray.to_gpu(self.quant.z_lay)
 
     def radiation_loop(self, quant, write, rt_plot, Vmod):
         """ loops over the relevant kernels iteratively until the equilibrium TP - profile reached """
