@@ -515,7 +515,7 @@ class Store(object):
     def create_zero_arrays(self, Vmod):
         """ creates zero arrays of quantities to be used on the GPU with the correct length/dimension """
 
-        self.delta_colmass = np.zeros(self.nlayer, self.fl_prec)
+        # self.delta_colmass = np.zeros(self.nlayer, self.fl_prec)
         self.F_up_band = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.F_down_band = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.F_dir_band = np.zeros(self.ninterface_nbin, self.fl_prec)
@@ -672,7 +672,9 @@ class Store(object):
 
         # zero arrays (copying anyway to obtain the gpuarray functionality)
         # those arrays will be copied to host at the end of computation or need to be zero-filled
-        self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
+
+        #self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
+
         self.dev_F_up_band = gpuarray.to_gpu(self.F_up_band)
         self.dev_F_down_band = gpuarray.to_gpu(self.F_down_band)
         self.dev_F_dir_band = gpuarray.to_gpu(self.F_dir_band)
@@ -740,7 +742,17 @@ class Store(object):
     def copy_device_to_host(self):
         """ copies relevant device arrays to host """
 
-        self.delta_colmass = self.dev_delta_colmass.get()
+        # self.delta_colmass = self.dev_delta_colmass.get()
+        # if self.dev_delta_colmass is not None:
+        #     print("Copy from device:",
+        #           np.uint64(self.dev_delta_colmass),
+        #           type(self.dev_delta_colmass),
+        #           (self.nlayer),
+        #           np.float64)
+        #     self.delta_colmass = cuda.from_device(self.dev_delta_colmass,
+        #                                           (self.nlayer,),
+        #                                           np.float64)
+
         self.F_up_band = self.dev_F_up_band.get()
         self.F_down_band = self.dev_F_down_band.get()
         self.F_dir_band = self.dev_F_dir_band.get()
@@ -810,13 +822,13 @@ class Store(object):
         # these arrays will never be copied between host and device.
         # Hence the normal mem_alloc functionality
         self.dev_T_int = cuda.mem_alloc(size_ninterface)
-        self.dev_delta_col_upper = cuda.mem_alloc(size_nlayer)
-        self.dev_delta_col_lower = cuda.mem_alloc(size_nlayer)
+        # self.dev_delta_col_upper = cuda.mem_alloc(size_nlayer)
+        # self.dev_delta_col_lower = cuda.mem_alloc(size_nlayer)
         self.dev_delta_t_prefactor = cuda.mem_alloc(size_nlayer)
         self.dev_T_store = cuda.mem_alloc(size_nlayer)
         self.dev_opac_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
         self.dev_meanmolmass_int = cuda.mem_alloc(size_ninterface)
-#        self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
+        #        self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
         self.dev_trans_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
 
         if self.iso == 0:

@@ -46,9 +46,9 @@ class Compute(object):
 
         gridkernel(quant.dev_p_lay,
                    quant.dev_p_int,
-                   quant.dev_delta_colmass,
-                   quant.dev_delta_col_upper,
-                   quant.dev_delta_col_lower,
+                   np.uint64(quant.dev_delta_colmass),
+                   np.uint64(quant.dev_delta_col_upper),
+                   np.uint64(quant.dev_delta_col_lower),
                    quant.p_boa,
                    quant.p_toa,
                    quant.nlayer,
@@ -312,12 +312,9 @@ class Compute(object):
                 correct_surface_emissions,
                 interp_and_calc_flux_step,
                 quant.dev_trans_wg,                 # out
-                quant.dev_delta_colmass.ptr,        # in
 
                 quant.dev_trans_wg_upper,           # out
                 quant.dev_trans_wg_lower,           # out
-                quant.dev_delta_col_upper,          # in
-                quant.dev_delta_col_lower,          # in
                 quant.dev_cloud_opac_lay.ptr,       # in
                 quant.dev_cloud_opac_int.ptr,       # in
                 quant.dev_cloud_scat_cross_lay.ptr,  # in

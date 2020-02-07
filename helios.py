@@ -109,6 +109,9 @@ def run_helios():
      dev_delta_tau_wg_ptr,
      dev_delta_tau_wg_upper_ptr,
      dev_delta_tau_wg_lower_ptr,
+     dev_delta_colmass_ptr,
+     dev_delta_col_upper_ptr,
+     dev_delta_col_lower_ptr,
      plancktable_dim,
      plancktable_step) = pylfrodull.get_dev_pointers()
 
@@ -117,7 +120,17 @@ def run_helios():
     keeper.dev_delta_tau_wg_lower = np.uint64(dev_delta_tau_wg_lower_ptr)
     keeper.dev_planckband_lay = np.uint64(dev_planck_lay_ptr)
     keeper.dev_planckband_grid = np.uint64(dev_planck_grid_ptr)
+
+    keeper.dev_delta_colmass = dev_delta_colmass_ptr
+    keeper.dev_delta_col_upper = dev_delta_col_upper_ptr
+    keeper.dev_delta_col_lower = dev_delta_col_lower_ptr
+
     # print("dev_planck_grid: ", dev_planck_grid_ptr)
+    # print("dev_delta_colmass_ptr", dev_delta_colmass_ptr)
+    # delta_colmass = cuda.from_device(dev_delta_colmass_ptr,
+    #                                  (keeper.nlayer),
+    #                                  np.float64)
+    # print("delta_colmass", delta_colmass)
     # print(cuda.from_device(dev_planck_grid_ptr,
     #                        ((plancktable_dim+1)*323),
     #                        np.float64))
@@ -199,28 +212,69 @@ def run_helios():
 
     # copy everything back to host and write to files
     ##########################
-    keeper.copy_device_to_host()
+    # if self.dev_delta_colmass is not None:
+    #     print("Copy from device:",
+    #           np.uint64(self.dev_delta_colmass),
+    #           type(self.dev_delta_colmass),
+    #           (self.nlayer),
+    #           np.float64)
+    ##########################
+
+    pointers = pylfrodull.get_dev_pointers()
+    for i, p in enumerate(pointers):
+        print(f"{i}: {p:x}")
+
+    (dev_scat_cross_section_lay_ptr,
+     dev_scat_cross_section_int_ptr,
+     dev_interwave_ptr,
+     dev_deltawave_ptr,
+     dev_planck_lay_ptr,
+     dev_planck_int_ptr,
+     dev_planck_grid_ptr,
+     dev_delta_tau_wg_ptr,
+     dev_delta_tau_wg_upper_ptr,
+     dev_delta_tau_wg_lower_ptr,
+     dev_delta_colmass_ptr,
+     dev_delta_col_upper_ptr,
+     dev_delta_col_lower_ptr,
+     plancktable_dim,
+     plancktable_step) = pointers
+
     nlayer = keeper.nlayer
     nbin = keeper.nbin
     ninterface = keeper.ninterface
-
+    cuda.Context.synchronize()
     print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
     keeper.scat_cross_lay = cuda.from_device(dev_scat_cross_section_lay_ptr,
                                              (nlayer*nbin),
                                              np.float64)
-    print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
-    keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
-                                             (ninterface*nbin),
-                                             np.float64)
-
+    cuda.Context.synchronize()
     # print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
     keeper.planckband_int = cuda.from_device(dev_planck_int_ptr,
                                              (ninterface*nbin),
                                              np.float64)
+    cuda.Context.synchronize()
     # print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
     keeper.planckband_lay = cuda.from_device(dev_planck_lay_ptr,
                                              ((nlayer+2)*nbin),
                                              np.float64)
+    cuda.Context.synchronize()
+    delta_colmass = cuda.from_device(dev_delta_colmass_ptr,
+                                     (keeper.nlayer,),
+                                     np.float64)
+    keeper.delta_colmass = delta_colmass
+
+    print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
+    #result = np.zeros((ninterface*nbin), dtype=np.float64)
+    print(f"{ninterface*nbin} {ninterface} {nbin}")
+
+    result = np.zeros((2), dtype=np.float64)
+    #cuda.memcpy_dtoh(result, dev_scat_cross_section_int_ptr)
+    keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
+                                             (ninterface*nbin),
+                                             np.float64)
+
+    keeper.copy_device_to_host()
     ##########################
 
     hsfunc.calculate_conv_flux(keeper)
