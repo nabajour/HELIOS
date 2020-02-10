@@ -95,14 +95,16 @@ def run_helios():
         keeper.energy_correction
     )
 
-    dev_scat_cross_section_lay_ptr = 0
-    dev_scat_cross_section_int_ptr = 0
-    dev_interwave_ptr = 0
-    dev_deltawave_ptr = 0
-    (dev_scat_cross_section_int_ptr,
-     dev_scat_cross_section_lay_ptr,
+    # device pointers
+    pointers = pylfrodull.get_dev_pointers()
+    for i, p in enumerate(pointers):
+        print(f"{i}: {p:x}")
+
+    (dev_scat_cross_section_lay_ptr,
+     dev_scat_cross_section_int_ptr,
      dev_interwave_ptr,
      dev_deltawave_ptr,
+     dev_opac_wg_lay_ptr,
      dev_planck_lay_ptr,
      dev_planck_int_ptr,
      dev_planck_grid_ptr,
@@ -112,8 +114,12 @@ def run_helios():
      dev_delta_colmass_ptr,
      dev_delta_col_upper_ptr,
      dev_delta_col_lower_ptr,
+     dev_meanmolmass_ptr,
+     dev_trans_wg_ptr,
+     dev_trans_wg_upper_ptr,
+     dev_trans_wg_lower_ptr,
      plancktable_dim,
-     plancktable_step) = pylfrodull.get_dev_pointers()
+     plancktable_step) = pointers
 
     keeper.dev_delta_tau_wg = np.uint64(dev_delta_tau_wg_ptr)
     keeper.dev_delta_tau_wg_upper = np.uint64(dev_delta_tau_wg_upper_ptr)
@@ -124,6 +130,14 @@ def run_helios():
     keeper.dev_delta_colmass = dev_delta_colmass_ptr
     keeper.dev_delta_col_upper = dev_delta_col_upper_ptr
     keeper.dev_delta_col_lower = dev_delta_col_lower_ptr
+    # used in printout, needs to be copied back
+    keeper.dev_meanmolmass_lay = dev_meanmolmass_ptr
+    # used in final values computation (postprocess), no need to copy back
+    keeper.dev_trans_wg = dev_trans_wg_ptr
+    keeper.dev_trans_wg_upper = dev_trans_wg_upper_ptr
+    keeper.dev_trans_wg_lower = dev_trans_wg_lower_ptr
+    # used in final values computation (postprocess), no need to copy back
+    keeper.dev_opac_wg_lay = dev_opac_wg_lay_ptr
 
     # print("dev_planck_grid: ", dev_planck_grid_ptr)
     # print("dev_delta_colmass_ptr", dev_delta_colmass_ptr)
@@ -219,26 +233,7 @@ def run_helios():
     #           (self.nlayer),
     #           np.float64)
     ##########################
-
-    pointers = pylfrodull.get_dev_pointers()
-    for i, p in enumerate(pointers):
-        print(f"{i}: {p:x}")
-
-    (dev_scat_cross_section_lay_ptr,
-     dev_scat_cross_section_int_ptr,
-     dev_interwave_ptr,
-     dev_deltawave_ptr,
-     dev_planck_lay_ptr,
-     dev_planck_int_ptr,
-     dev_planck_grid_ptr,
-     dev_delta_tau_wg_ptr,
-     dev_delta_tau_wg_upper_ptr,
-     dev_delta_tau_wg_lower_ptr,
-     dev_delta_colmass_ptr,
-     dev_delta_col_upper_ptr,
-     dev_delta_col_lower_ptr,
-     plancktable_dim,
-     plancktable_step) = pointers
+    # stuff to copy back
 
     nlayer = keeper.nlayer
     nbin = keeper.nbin
@@ -248,31 +243,29 @@ def run_helios():
     keeper.scat_cross_lay = cuda.from_device(dev_scat_cross_section_lay_ptr,
                                              (nlayer*nbin),
                                              np.float64)
-    cuda.Context.synchronize()
+
     # print(f"scat_cross_lay_ptr: {dev_scat_cross_section_lay_ptr}")
     keeper.planckband_int = cuda.from_device(dev_planck_int_ptr,
                                              (ninterface*nbin),
                                              np.float64)
-    cuda.Context.synchronize()
     # print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
     keeper.planckband_lay = cuda.from_device(dev_planck_lay_ptr,
                                              ((nlayer+2)*nbin),
                                              np.float64)
-    cuda.Context.synchronize()
     delta_colmass = cuda.from_device(dev_delta_colmass_ptr,
                                      (keeper.nlayer,),
                                      np.float64)
     keeper.delta_colmass = delta_colmass
 
-    print(f"scat_cross_int_ptr: {dev_scat_cross_section_int_ptr}")
-    #result = np.zeros((ninterface*nbin), dtype=np.float64)
-    print(f"{ninterface*nbin} {ninterface} {nbin}")
-
-    result = np.zeros((2), dtype=np.float64)
-    #cuda.memcpy_dtoh(result, dev_scat_cross_section_int_ptr)
     keeper.scat_cross_int = cuda.from_device(dev_scat_cross_section_int_ptr,
                                              (ninterface*nbin),
                                              np.float64)
+
+    keeper.meanmolmass_lay = cuda.from_device(dev_meanmolmass_ptr,
+                                              (nlayer),
+                                              np.float64)
+
+    cuda.Context.synchronize()
 
     keeper.copy_device_to_host()
     ##########################
