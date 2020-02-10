@@ -63,7 +63,24 @@ def run_helios():
         Vmodder.read_species()
         Vmodder.read_molecular_opacities(keeper)
         Vmodder.read_layer_molecular_abundance(keeper)
-    reader.read_opac_file(keeper, Vmodder)
+
+    ##################################################
+    (dev_interwave_ptr,
+     dev_deltawave_ptr,
+     nbin,
+     ny) = pylfrodull.get_opac_data_for_helios()
+
+    keeper.nbin = nbin
+    keeper.ny = ny
+
+    keeper.dev_opac_deltawave = np.uint64(dev_deltawave_ptr)
+    keeper.opac_deltawave = cuda.from_device(dev_deltawave_ptr,
+                                             (keeper.nbin),
+                                             np.float64)
+
+    ##################################################
+
+    # reader.read_opac_file(keeper, Vmodder)
     reader.read_entropy_table(keeper)
     cloudy.main_cloud_method(keeper)
     keeper.dimensions()
@@ -102,8 +119,6 @@ def run_helios():
 
     (dev_scat_cross_section_lay_ptr,
      dev_scat_cross_section_int_ptr,
-     dev_interwave_ptr,
-     dev_deltawave_ptr,
      dev_opac_wg_lay_ptr,
      dev_planck_lay_ptr,
      dev_planck_int_ptr,
@@ -130,8 +145,10 @@ def run_helios():
     keeper.dev_delta_colmass = np.uint64(dev_delta_colmass_ptr)
     keeper.dev_delta_col_upper = np.uint64(dev_delta_col_upper_ptr)
     keeper.dev_delta_col_lower = np.uint64(dev_delta_col_lower_ptr)
+
     # used in printout, needs to be copied back
     keeper.dev_meanmolmass_lay = np.uint64(dev_meanmolmass_ptr)
+
     # used in final values computation (postprocess), no need to copy back
     keeper.dev_trans_wg = np.uint64(dev_trans_wg_ptr)
     keeper.dev_trans_wg_upper = np.uint64(dev_trans_wg_upper_ptr)

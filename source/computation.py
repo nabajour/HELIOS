@@ -275,7 +275,6 @@ class Compute(object):
                 quant.dev_T_int,                 # in
                 quant.dev_p_lay.ptr,             # in
                 quant.dev_p_int.ptr,             # in
-                quant.ninterface,
                 quant.real_star,
                 quant.fake_opac,
                 quant.T_surf,
@@ -288,26 +287,25 @@ class Compute(object):
                 quant.dev_cloud_scat_cross_int.ptr,  # in
                 quant.dev_g_0_tot_lay.ptr,          # in
                 quant.dev_g_0_tot_int.ptr,          # in
-                quant.g_0,
-                quant.epsi,
-                quant.mu_star,
-                quant.scat,
-                quant.ny,
-                quant.clouds,
-                quant.scat_corr,
+                quant.g_0,                                        # float
+                quant.epsi,                                       # float
+                quant.mu_star,                                    # float, cos dir angle
+                quant.scat,                                       # yesno
+                quant.clouds,                                     # yesno
+                quant.scat_corr,                                  # yesno
 
                 quant.dev_z_lay.ptr,           # in
 
                 quant.R_planet,
                 quant.R_star,
                 quant.a,
-                quant.dir_beam,
-                quant.geom_zenith_corr,
+                quant.dir_beam,                                   # yesno
+                quant.geom_zenith_corr,                           # yesno
                 quant.singlewalk,
 
-                quant.f_factor,
+                quant.f_factor,                                   # float
                 quant.w_0_limit,
-                quant.surf_albedo,
+                quant.surf_albedo,                                # float
 
 
                 quant.dev_F_down_wg.ptr,        # out
@@ -317,8 +315,6 @@ class Compute(object):
                 quant.dev_F_dir_wg.ptr,         # in
                 quant.dev_Fc_dir_wg.ptr,        # in
                 quant.delta_tau_limit,
-
-                quant.dev_opac_deltawave.ptr,  # in
                 quant.dev_F_down_tot.ptr,      # out
                 quant.dev_F_up_tot.ptr,        # out
                 quant.dev_F_net.ptr,           # out
