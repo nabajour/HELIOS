@@ -65,18 +65,34 @@ def run_helios():
         Vmodder.read_layer_molecular_abundance(keeper)
 
     ##################################################
-    (dev_interwave_ptr,
+    (dev_opac_wave_ptr,
+     dev_interwave_ptr,
      dev_deltawave_ptr,
+     dev_opac_y_ptr,
      nbin,
      ny) = pylfrodull.get_opac_data_for_helios()
 
-    keeper.nbin = nbin
-    keeper.ny = ny
+    keeper.nbin = np.uint32(nbin)
+    keeper.ny = np.uint32(ny)
+
+    keeper.dev_opac_wave = np.uint64(dev_opac_wave_ptr)
+
+    keeper.opac_wave = cuda.from_device(dev_opac_wave_ptr,
+                                        (keeper.nbin),
+                                        np.float64)
+
+    keeper.dev_opac_interwave = np.uint64(dev_interwave_ptr)
+    keeper.opac_interwave = cuda.from_device(dev_interwave_ptr,
+                                             (keeper.nbin + 1),
+                                             np.float64)
 
     keeper.dev_opac_deltawave = np.uint64(dev_deltawave_ptr)
+
     keeper.opac_deltawave = cuda.from_device(dev_deltawave_ptr,
                                              (keeper.nbin),
                                              np.float64)
+
+    keeper.dev_opac_y = np.uint64(dev_opac_y_ptr)
 
     ##################################################
 
