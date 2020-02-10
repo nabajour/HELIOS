@@ -127,17 +127,17 @@ def run_helios():
     keeper.dev_planckband_lay = np.uint64(dev_planck_lay_ptr)
     keeper.dev_planckband_grid = np.uint64(dev_planck_grid_ptr)
 
-    keeper.dev_delta_colmass = dev_delta_colmass_ptr
-    keeper.dev_delta_col_upper = dev_delta_col_upper_ptr
-    keeper.dev_delta_col_lower = dev_delta_col_lower_ptr
+    keeper.dev_delta_colmass = np.uint64(dev_delta_colmass_ptr)
+    keeper.dev_delta_col_upper = np.uint64(dev_delta_col_upper_ptr)
+    keeper.dev_delta_col_lower = np.uint64(dev_delta_col_lower_ptr)
     # used in printout, needs to be copied back
-    keeper.dev_meanmolmass_lay = dev_meanmolmass_ptr
+    keeper.dev_meanmolmass_lay = np.uint64(dev_meanmolmass_ptr)
     # used in final values computation (postprocess), no need to copy back
-    keeper.dev_trans_wg = dev_trans_wg_ptr
-    keeper.dev_trans_wg_upper = dev_trans_wg_upper_ptr
-    keeper.dev_trans_wg_lower = dev_trans_wg_lower_ptr
+    keeper.dev_trans_wg = np.uint64(dev_trans_wg_ptr)
+    keeper.dev_trans_wg_upper = np.uint64(dev_trans_wg_upper_ptr)
+    keeper.dev_trans_wg_lower = np.uint64(dev_trans_wg_lower_ptr)
     # used in final values computation (postprocess), no need to copy back
-    keeper.dev_opac_wg_lay = dev_opac_wg_lay_ptr
+    keeper.dev_opac_wg_lay = np.uint64(dev_opac_wg_lay_ptr)
 
     # print("dev_planck_grid: ", dev_planck_grid_ptr)
     # print("dev_delta_colmass_ptr", dev_delta_colmass_ptr)

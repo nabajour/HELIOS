@@ -831,13 +831,13 @@ class Store(object):
         # self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
         # self.dev_trans_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
 
-        if self.iso == 0:
-            # self.dev_opac_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
-            #            self.dev_scat_cross_int = cuda.mem_alloc(size_ninterface_nbin)
-            #            self.dev_delta_tau_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            #            self.dev_delta_tau_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
-            #self.dev_trans_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
-            #self.dev_trans_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
+        # if self.iso == 0:
+        # self.dev_opac_wg_int = cuda.mem_alloc(size_ninterface_wg_nbin)
+        #            self.dev_scat_cross_int = cuda.mem_alloc(size_ninterface_nbin)
+        #            self.dev_delta_tau_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
+        #            self.dev_delta_tau_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
+        #self.dev_trans_wg_upper = cuda.mem_alloc(size_nlayer_wg_nbin)
+        #self.dev_trans_wg_lower = cuda.mem_alloc(size_nlayer_wg_nbin)
 
         if Vmod.V_coupling == 1:
 
