@@ -65,6 +65,7 @@ def run_helios():
         Vmodder.read_layer_molecular_abundance(keeper)
 
     ##################################################
+    # transfer data from opacity table
     (dev_opac_wave_ptr,
      dev_interwave_ptr,
      dev_deltawave_ptr,
@@ -117,7 +118,33 @@ def run_helios():
     ##########################
     pylfrodull.init_parameters(keeper.nlayer,
                                keeper.iso,
-                               keeper.T_star)
+                               keeper.T_star,
+                               keeper.real_star,
+                               keeper.fake_opac,
+                               keeper.T_surf,
+                               keeper.surf_albedo,
+                               keeper.g_0,
+                               keeper.epsi,
+                               keeper.mu_star,
+                               keeper.scat,
+                               keeper.scat_corr,
+                               keeper.R_planet,
+                               keeper.R_star,
+                               keeper.a,
+                               keeper.dir_beam,
+                               keeper.geom_zenith_corr,
+                               keeper.f_factor,
+                               keeper.w_0_limit,
+                               keeper.surf_albedo  # TODO: check, there is only one of these albedo vars
+                               )
+
+    pylfrodull.set_clouds_data(keeper.clouds,
+                               keeper.dev_cloud_opac_lay.ptr,
+                               keeper.dev_cloud_opac_int.ptr,
+                               keeper.dev_cloud_scat_cross_lay.ptr,
+                               keeper.dev_cloud_scat_cross_int.ptr,
+                               keeper.dev_g_0_tot_lay.ptr,
+                               keeper.dev_g_0_tot_int.ptr)
 
     pylfrodull.allocate()
 

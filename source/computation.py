@@ -269,45 +269,18 @@ class Compute(object):
                 use_kappa_manual = True
                 kappa_kernel_value = quant.fl_prec(quant.kappa_manual_value)
 
+            pylfrodull.set_surface_temperature(quant.T_surf)
             pylfrodull.pycompute_radiative_transfer(
                 quant.dev_starflux.ptr,
                 quant.dev_T_lay.ptr,             # out
                 quant.dev_T_int,                 # in
                 quant.dev_p_lay.ptr,             # in
                 quant.dev_p_int.ptr,             # in
-                quant.real_star,
-                quant.fake_opac,
-                quant.T_surf,
-                quant.surf_albedo,
                 correct_surface_emissions,
                 interp_and_calc_flux_step,
-                quant.dev_cloud_opac_lay.ptr,       # in
-                quant.dev_cloud_opac_int.ptr,       # in
-                quant.dev_cloud_scat_cross_lay.ptr,  # in
-                quant.dev_cloud_scat_cross_int.ptr,  # in
-                quant.dev_g_0_tot_lay.ptr,          # in
-                quant.dev_g_0_tot_int.ptr,          # in
-                quant.g_0,                                        # float
-                quant.epsi,                                       # float
-                quant.mu_star,                                    # float, cos dir angle
-                quant.scat,                                       # yesno
-                quant.clouds,                                     # yesno
-                quant.scat_corr,                                  # yesno
-
+                # can ignore those, for clouds
                 quant.dev_z_lay.ptr,           # in
-
-                quant.R_planet,
-                quant.R_star,
-                quant.a,
-                quant.dir_beam,                                   # yesno
-                quant.geom_zenith_corr,                           # yesno
                 quant.singlewalk,
-
-                quant.f_factor,                                   # float
-                quant.w_0_limit,
-                quant.surf_albedo,                                # float
-
-
                 quant.dev_F_down_wg.ptr,        # out
                 quant.dev_F_up_wg.ptr,          # out
                 quant.dev_Fc_down_wg.ptr,       # out
