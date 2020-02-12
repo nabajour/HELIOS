@@ -102,11 +102,13 @@ class Store(object):
         self.kappa_manual_value = None
         self.kappa_kernel_value = None
         self.surf_albedo = None
-        self.T_surf = None
+        self.T_below = 0  # T_below is either the surface temperature for rocky planets or the below grid temperature for gas planets
         self.approx_f = None
         self.tau_lw = 1
         self.planet_type = None
         self.F_sens = 0
+        self.debug = None
+        self.i2s_transition = None
         # number of pre-tabulated temperature values for the planck table
         #self.plancktable_dim = np.int32(8000)
         # temperature step for the planck table. e.g. dim = 10000 and step = 2 will give a table from 1 K to 19999 K in 2 K steps
@@ -122,6 +124,16 @@ class Store(object):
         # input arrays to be copied CPU --> GPU
         # these need to be converted from lists to np.arrays of correct data format
         # and then copied to GPU with "gpuarray"
+        self.p_lay = None
+        self.dev_p_lay = None
+        self.p_int = None
+        self.dev_p_int = None
+        self.delta_colmass = []
+        self.dev_delta_colmass = None
+        self.delta_col_upper = []
+        self.dev_delta_col_upper = None
+        self.delta_col_lower = []
+        self.dev_delta_col_lower = None
         self.ktemp = None
         self.dev_ktemp = None
         self.kpress = None
@@ -257,8 +269,6 @@ class Store(object):
 
         # arrays to be copied GPU --> CPU
         # for these, zero arrays of correct size are created and then copied to GPU with "gpuarray" and copied back
-        self.delta_colmass = None
-        self.dev_delta_colmass = None
         self.F_up_band = None
         self.dev_F_up_band = None
         self.F_down_band = None
@@ -279,10 +289,6 @@ class Store(object):
         self.dev_F_net = None
         self.F_net_diff = None
         self.dev_F_net_diff = None
-        self.p_lay = None
-        self.dev_p_lay = None
-        self.p_int = None
-        self.dev_p_int = None
         # self.planckband_lay = None
         self.dev_planckband_lay = None
         self.planckband_int = None
@@ -335,8 +341,6 @@ class Store(object):
         # arrays exclusively used on the GPU
         # these are defined directly on the GPU and stay there. No copying required.
         self.dev_T_int = None
-        self.dev_delta_col_upper = None
-        self.dev_delta_col_lower = None
         self.dev_delta_t_prefactor = None
         self.dev_T_store = None
         self.dev_planckband_grid = None
@@ -438,6 +442,11 @@ class Store(object):
 
         #self.ktemp = np.array(self.ktemp, self.fl_prec)
         #self.kpress = np.array(self.kpress, self.fl_prec)
+        self.p_lay = np.array(self.p_lay, self.fl_prec)
+        self.p_int = np.array(self.p_int, self.fl_prec)
+        self.delta_colmass = np.array(self.delta_colmass, self.fl_prec)
+        self.delta_col_upper = np.array(self.delta_col_upper, self.fl_prec)
+        self.delta_col_lower = np.array(self.delta_col_lower, self.fl_prec)
         self.entr_temp = np.array(self.entr_temp, self.fl_prec)
         self.entr_press = np.array(self.entr_press, self.fl_prec)
         #self.opac_k = np.array(self.opac_k, self.fl_prec)
@@ -514,8 +523,6 @@ class Store(object):
 
     def create_zero_arrays(self, Vmod):
         """ creates zero arrays of quantities to be used on the GPU with the correct length/dimension """
-
-        # self.delta_colmass = np.zeros(self.nlayer, self.fl_prec)
         self.F_up_band = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.F_down_band = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.F_dir_band = np.zeros(self.ninterface_nbin, self.fl_prec)
@@ -542,7 +549,8 @@ class Store(object):
         self.ross_opac_T_star = np.zeros(self.nlayer, self.fl_prec)
         self.trans_band = np.zeros(self.nlayer_nbin, self.fl_prec)
         self.delta_tau_band = np.zeros(self.nlayer_nbin, self.fl_prec)
-        self.abort = np.zeros(self.nlayer, np.int32)
+        # including "ghost layer" below
+        self.abort = np.zeros(self.nlayer + 1, np.int32)
         self.c_p_lay = np.zeros(self.nlayer, self.fl_prec)
         self.test_arr = np.zeros(self.nlayer, self.fl_prec)
         self.kappa_lay = np.zeros(self.nlayer, self.fl_prec)
@@ -576,7 +584,6 @@ class Store(object):
         self.contr_cia_h2he = np.zeros(self.nbin, self.fl_prec)
         self.contr_rayleigh = np.zeros(self.nbin, self.fl_prec)
         self.contr_cloud = np.zeros(self.nbin, self.fl_prec)
-        self.conv_layer = np.zeros(self.nlayer, np.int32)
 
         if Vmod.V_iter_nr == 0:  # otherwise already filled with values
             self.meanmolmass_lay = np.zeros(self.nlayer, self.fl_prec)
@@ -596,7 +603,7 @@ class Store(object):
             self.f_he_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
 
         # arrays to be used purely on the CPU
-        self.conv_layer = np.zeros(self.nlayer, np.int32)
+        self.conv_layer = np.zeros(self.nlayer + 1, np.int32)
 
     def copy_host_to_device(self, Vmod):
         """ copies relevant host arrays to device """
@@ -604,6 +611,16 @@ class Store(object):
         # input arrays
         # self.dev_ktemp = gpuarray.to_gpu(self.ktemp)
         # self.dev_kpress = gpuarray.to_gpu(self.kpress)
+        # TODO: those 5 are new in copy?
+        self.dev_p_lay = gpuarray.to_gpu(self.p_lay)
+        self.dev_p_int = gpuarray.to_gpu(self.p_int)
+        self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
+        self.dev_delta_col_upper = gpuarray.to_gpu(self.delta_col_upper)
+        self.dev_delta_col_lower = gpuarray.to_gpu(self.delta_col_lower)
+
+        # maybe not delta_colmass
+        #self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
+
         self.dev_entr_temp = gpuarray.to_gpu(self.entr_temp)
         self.dev_entr_press = gpuarray.to_gpu(self.entr_press)
         # self.dev_opac_k = gpuarray.to_gpu(self.opac_k)
@@ -673,8 +690,6 @@ class Store(object):
         # zero arrays (copying anyway to obtain the gpuarray functionality)
         # those arrays will be copied to host at the end of computation or need to be zero-filled
 
-        #self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
-
         self.dev_F_up_band = gpuarray.to_gpu(self.F_up_band)
         self.dev_F_down_band = gpuarray.to_gpu(self.F_down_band)
         self.dev_F_dir_band = gpuarray.to_gpu(self.F_dir_band)
@@ -691,6 +706,7 @@ class Store(object):
         self.dev_p_lay = gpuarray.to_gpu(self.p_lay)
         self.dev_p_int = gpuarray.to_gpu(self.p_int)
         #        self.dev_planckband_lay = gpuarray.to_gpu(self.planckband_lay)
+
         self.dev_planck_opac_T_pl = gpuarray.to_gpu(self.planck_opac_T_pl)
         self.dev_ross_opac_T_pl = gpuarray.to_gpu(self.ross_opac_T_pl)
         self.dev_planck_opac_T_star = gpuarray.to_gpu(self.planck_opac_T_star)
@@ -814,6 +830,7 @@ class Store(object):
 
         size_ninterface = int(self.ninterface * self.nr_bytes)
         size_nlayer = int(self.nlayer * self.nr_bytes)
+        size_nlayer_plus1 = int((self.nlayer+1) * self.nr_bytes)
         size_nlayer_nbin = int(self.nlayer_nbin * self.nr_bytes)
         size_ninterface_nbin = int(self.ninterface_nbin * self.nr_bytes)
         size_nlayer_wg_nbin = int(self.nlayer_wg_nbin * self.nr_bytes)
@@ -824,8 +841,8 @@ class Store(object):
         self.dev_T_int = cuda.mem_alloc(size_ninterface)
         # self.dev_delta_col_upper = cuda.mem_alloc(size_nlayer)
         # self.dev_delta_col_lower = cuda.mem_alloc(size_nlayer)
-        self.dev_delta_t_prefactor = cuda.mem_alloc(size_nlayer)
-        self.dev_T_store = cuda.mem_alloc(size_nlayer)
+        self.dev_delta_t_prefactor = cuda.mem_alloc(size_nlayer_plus1)
+        self.dev_T_store = cuda.mem_alloc(size_nlayer_plus1)
         #self.dev_opac_wg_lay = cuda.mem_alloc(size_nlayer_wg_nbin)
         # self.dev_meanmolmass_int = cuda.mem_alloc(size_ninterface)
         # self.dev_delta_tau_wg = cuda.mem_alloc(size_nlayer_wg_nbin)
