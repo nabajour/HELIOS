@@ -122,7 +122,7 @@ def run_helios():
                                keeper.T_star,
                                keeper.real_star,
                                keeper.fake_opac,
-                               keeper.T_surf,
+                               0.0,  # TODO cleanup
                                keeper.surf_albedo,
                                keeper.g_0,
                                keeper.epsi,
@@ -136,7 +136,9 @@ def run_helios():
                                keeper.geom_zenith_corr,
                                keeper.f_factor,
                                keeper.w_0_limit,
-                               keeper.surf_albedo  # TODO: check, there is only one of these albedo vars
+                               keeper.surf_albedo,  # TODO: check, there is only one of these albedo vars
+                               keeper.i2s_transition,
+                               keeper.debug
                                )
 
     pylfrodull.set_clouds_data(keeper.clouds,
@@ -200,6 +202,16 @@ def run_helios():
     # used in final values computation (postprocess), no need to copy back
     keeper.dev_opac_wg_lay = np.uint64(dev_opac_wg_lay_ptr)
 
+    print(keeper.dev_delta_colmass,
+          keeper.delta_colmass,
+          type(keeper.delta_colmass),
+          keeper.delta_colmass.dtype)
+
+    cuda.memcpy_htod(int(keeper.dev_delta_col_lower), keeper.delta_col_lower)
+    cuda.memcpy_htod(int(dev_delta_colmass_ptr),
+                     keeper.delta_colmass)
+    cuda.memcpy_htod(int(keeper.dev_delta_col_upper), keeper.delta_col_upper)
+
     # print("dev_planck_grid: ", dev_planck_grid_ptr)
     # print("dev_delta_colmass_ptr", dev_delta_colmass_ptr)
     # delta_colmass = cuda.from_device(dev_delta_colmass_ptr,
@@ -230,6 +242,8 @@ def run_helios():
         if Vmodder.V_iter_nr > 0:
             Vmodder.interpolate_f_molecule_and_meanmolmass(keeper)
             Vmodder.combine_to_scat_cross(keeper)
+
+    print(keeper.dev_gauss_weight)
 
     computer.radiation_loop(keeper, writer, plotter, Vmodder)
 

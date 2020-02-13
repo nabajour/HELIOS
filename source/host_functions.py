@@ -712,7 +712,7 @@ def calculate_height_z(quant):
     """ calculates the altitude of the layer centers, either above ground or 10 bar pressure level """
 
     if quant.planet_type == 'gas':
-
+        print(quant.p_lay)
         # gas planets with pressures of more than 10 bar: white light radius at 10 bar
         i_white_light_radius = max(
             [i for i in range(quant.nlayer) if quant.p_lay[i] >= 1e7])

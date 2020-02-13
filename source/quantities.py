@@ -539,8 +539,6 @@ class Store(object):
         # self.scat_cross_lay = np.zeros(self.nlayer_nbin, self.fl_prec)
         self.F_net = np.zeros(self.ninterface, self.fl_prec)
         self.F_net_diff = np.zeros(self.nlayer, self.fl_prec)
-        self.p_lay = np.zeros(self.nlayer, self.fl_prec)
-        self.p_int = np.zeros(self.ninterface, self.fl_prec)
         #self.planckband_lay = np.zeros(self.nlayer_plus2_nbin, self.fl_prec)
         #self.planckband_int = np.zeros(self.ninterface_nbin, self.fl_prec)
         self.planck_opac_T_pl = np.zeros(self.nlayer, self.fl_prec)
@@ -614,9 +612,9 @@ class Store(object):
         # TODO: those 5 are new in copy?
         self.dev_p_lay = gpuarray.to_gpu(self.p_lay)
         self.dev_p_int = gpuarray.to_gpu(self.p_int)
-        self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
-        self.dev_delta_col_upper = gpuarray.to_gpu(self.delta_col_upper)
-        self.dev_delta_col_lower = gpuarray.to_gpu(self.delta_col_lower)
+        # self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
+        # self.dev_delta_col_upper = gpuarray.to_gpu(self.delta_col_upper)
+        # self.dev_delta_col_lower = gpuarray.to_gpu(self.delta_col_lower)
 
         # maybe not delta_colmass
         #self.dev_delta_colmass = gpuarray.to_gpu(self.delta_colmass)
