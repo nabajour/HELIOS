@@ -64,7 +64,8 @@ class Write(object):
 
         try:
             with open(read.output_path + quant.name + "/" + quant.name + "_ABORT.dat", "w") as file:
-                file.writelines("The run exceeded the maximum number of iteration steps and was aborted. Sorry.")
+                file.writelines(
+                    "The run exceeded the maximum number of iteration steps and was aborted. Sorry.")
         except TypeError:
             print("ABORT file generation corrupted. You might want to look into it!")
 
@@ -80,7 +81,7 @@ class Write(object):
                 raise
 
         try:
-            with open(read.output_path +quant.name+"/" + quant.name + "_output_info.dat", "w") as file:
+            with open(read.output_path + quant.name+"/" + quant.name + "_output_info.dat", "w") as file:
                 file.write("""
 H E L I O S   O U T P U T   I N F O R M A T I O N
 =================================================
@@ -112,29 +113,44 @@ These are the parameters used in the production of this HELIOS output.
                 file.writelines("\n")
                 file.writelines("\n### ITERATION ###")
                 file.writelines("\n")
-                file.writelines("\npost-processing only = " + self.convert_1_0_to_yes_no(quant.singlewalk))
-                file.writelines("\npath to temperature file = " + read.temp_path)
-                file.writelines("\ntemperature file format & P unit = " + read.temp_format+" "+read.temp_pressure_unit)
-                file.writelines("\nadaptive interval = {:g}".format(quant.adapt_interval))
-                file.writelines("\nTP profile smoothing = " + self.convert_1_0_to_yes_no(quant.smooth))
+                file.writelines("\npost-processing only = " +
+                                self.convert_1_0_to_yes_no(quant.singlewalk))
+                file.writelines(
+                    "\npath to temperature file = " + read.temp_path)
+                file.writelines("\ntemperature file format & P unit = " +
+                                read.temp_format+" "+read.temp_pressure_unit)
+                file.writelines(
+                    "\nadaptive interval = {:g}".format(quant.adapt_interval))
+                file.writelines("\nTP profile smoothing = " +
+                                self.convert_1_0_to_yes_no(quant.smooth))
                 file.writelines("\n---")
                 file.writelines("\n")
                 file.writelines("\n### RADIATION ###")
                 file.writelines("\n")
-                file.writelines("\ndirect irradiation beam = " + self.convert_1_0_to_yes_no(quant.dir_beam))
-                file.writelines("\nscattering = " + self.convert_1_0_to_yes_no(quant.scat))
-                file.writelines("\nimproved two-stream correction = " + self.convert_1_0_to_yes_no(quant.scat_corr))
-                file.writelines("\nasymmetry factor g_0 = {:g}".format(quant.g_0))
+                file.writelines("\ndirect irradiation beam = " +
+                                self.convert_1_0_to_yes_no(quant.dir_beam))
+                file.writelines("\nscattering = " +
+                                self.convert_1_0_to_yes_no(quant.scat))
+                file.writelines("\nimproved two-stream correction = " +
+                                self.convert_1_0_to_yes_no(quant.scat_corr))
+                file.writelines(
+                    "\nasymmetry factor g_0 = {:g}".format(quant.g_0))
                 file.writelines("\npath to opacity file = " + read.ktable_path)
                 file.writelines(
                     "\ndiffusivity factor = {:g}".format(quant.diffusivity))
                 file.writelines("\nf factor = {:g}".format(quant.f_factor))
-                file.writelines("\nstellar zenith angle [deg] = {:g}".format(180 - quant.dir_angle*180/npy.pi))
-                file.writelines("\ngeometric zenith angle correction = " + self.convert_1_0_to_yes_no(quant.geom_zenith_corr))
-                file.writelines("\ninternal temperature [K] = {:g}".format(quant.T_intern))
-                file.writelines("\nsurface/BOA temperature [K] = {:g}".format(quant.T_lay[quant.nlayer]))
-                file.writelines("\nsurface/BOA albedo = {:g}".format(quant.surf_albedo))
-                file.writelines("\nenergy budget correction = " + self.convert_1_0_to_yes_no(quant.energy_correction))
+                file.writelines("\nstellar zenith angle [deg] = {:g}".format(
+                    180 - quant.dir_angle*180/npy.pi))
+                file.writelines("\ngeometric zenith angle correction = " +
+                                self.convert_1_0_to_yes_no(quant.geom_zenith_corr))
+                file.writelines(
+                    "\ninternal temperature [K] = {:g}".format(quant.T_intern))
+                file.writelines(
+                    "\nsurface/BOA temperature [K] = {:g}".format(quant.T_lay[quant.nlayer]))
+                file.writelines(
+                    "\nsurface/BOA albedo = {:g}".format(quant.surf_albedo))
+                file.writelines("\nenergy budget correction = " +
+                                self.convert_1_0_to_yes_no(quant.energy_correction))
                 file.writelines("\n---")
                 file.writelines("\n")
                 file.writelines("\n### CONVECTIVE ADJUSTMENT ###")
@@ -173,18 +189,28 @@ These are the parameters used in the production of this HELIOS output.
                 file.writelines("\n")
                 file.writelines("\n### EXPERIMENTAL ###")
                 file.writelines("\n")
-                file.writelines("\ndebugging feedback = " + self.convert_1_0_to_yes_no(quant.debug))
-                file.writelines("\nI2S transition point = {:g}".format(quant.i2s_transition))
-                file.writelines("\nclouds = " + self.convert_1_0_to_yes_no(quant.clouds))
+                file.writelines("\ndebugging feedback = " +
+                                self.convert_1_0_to_yes_no(quant.debug))
+                file.writelines(
+                    "\nI2S transition point = {:g}".format(quant.i2s_transition))
+                file.writelines(
+                    "\nclouds = " + self.convert_1_0_to_yes_no(quant.clouds))
                 file.writelines("\npath to cloud file = " + quant.cloud_path)
-                file.writelines("\ntotal cloud opacity [cm^2 g^-1] = {:g}".format(quant.cloud_opac_tot))
-                file.writelines("\ncloud center pressure [10^-6 bar] = {:g}".format(quant.cloud_press))
-                file.writelines("\ncloud width (std.dev.) [dex] = {:g}".format(quant.cloud_width))
-                file.writelines("\nnumber of run-in timesteps = {:g}".format(quant.foreplay))
-                file.writelines("\nartificial shortw. opacity = {:g}".format(quant.fake_opac))
-                file.writelines("\nvarying timestep = " + self.convert_1_0_to_yes_no(quant.varying_tstep))
+                file.writelines(
+                    "\ntotal cloud opacity [cm^2 g^-1] = {:g}".format(quant.cloud_opac_tot))
+                file.writelines(
+                    "\ncloud center pressure [10^-6 bar] = {:g}".format(quant.cloud_press))
+                file.writelines(
+                    "\ncloud width (std.dev.) [dex] = {:g}".format(quant.cloud_width))
+                file.writelines(
+                    "\nnumber of run-in timesteps = {:g}".format(quant.foreplay))
+                file.writelines(
+                    "\nartificial shortw. opacity = {:g}".format(quant.fake_opac))
+                file.writelines("\nvarying timestep = " +
+                                self.convert_1_0_to_yes_no(quant.varying_tstep))
                 file.writelines("\ntimestep [s] = {:g}".format(quant.tstep))
-                file.writelines("\nuse f approximation formula = " + self.convert_1_0_to_yes_no(quant.approx_f))
+                file.writelines("\nuse f approximation formula = " +
+                                self.convert_1_0_to_yes_no(quant.approx_f))
                 file.writelines("\n---")
                 file.writelines("\n")
                 file.writelines("\n### VULCAN COUPLING ###")
@@ -219,8 +245,9 @@ These are the parameters used in the production of this HELIOS output.
         _, _, _, _, T_bright = hsfunc.temp_calcs(quant)
 
         try:
-            with open(read.output_path +quant.name+"/" + quant.name + "_tp.dat", "w") as file:
-                file.writelines("This file contains the corresponding layer temperatures and pressures, and the altitude and the height of each layer.")
+            with open(read.output_path + quant.name+"/" + quant.name + "_tp.dat", "w") as file:
+                file.writelines(
+                    "This file contains the corresponding layer temperatures and pressures, and the altitude and the height of each layer.")
 
                 file.writelines(
                     "\n{:<8}{:<18}{:<24}{:<21}{:<23}{:<30}{:<32}{:<18}".format(
@@ -231,10 +258,12 @@ These are the parameters used in the production of this HELIOS output.
                     "BOA", quant.T_lay[quant.nlayer], quant.p_int[0], quant.z_lay[0] - 0.5 * quant.delta_z_lay[0], "not_avail."))
 
                 if quant.iso == 0 and quant.convection == 1:
-                    file.writelines("{:<30g}{:<32g}".format(quant.conv_unstable[quant.nlayer], quant.conv_layer[quant.nlayer]))
+                    file.writelines("{:<30g}{:<32g}".format(
+                        quant.conv_unstable[quant.nlayer], quant.conv_layer[quant.nlayer]))
 
                 if quant.iso == 1 or quant.convection == 0:
-                    file.writelines("{:<30}{:<32}".format("not_calculated", "not_calculated"))
+                    file.writelines("{:<30}{:<32}".format(
+                        "not_calculated", "not_calculated"))
 
                 file.writelines("{:<18g}".format(T_bright))
 
@@ -246,9 +275,11 @@ These are the parameters used in the production of this HELIOS output.
                         + "{:<21g}".format(quant.z_lay[i])
                         + "{:<23g}".format(quant.delta_z_lay[i]))
                     if quant.iso == 0 and quant.convection == 1:
-                        file.writelines("{:<30g}{:<32g}".format(quant.conv_unstable[i], quant.conv_layer[i]))
+                        file.writelines("{:<30g}{:<32g}".format(
+                            quant.conv_unstable[i], quant.conv_layer[i]))
                     if quant.iso == 1 or quant.convection == 0:
-                        file.writelines("{:<30}{:<32}".format("not_calculated", "not_calculated"))
+                        file.writelines("{:<30}{:<32}".format(
+                            "not_calculated", "not_calculated"))
         except TypeError:
             print("TP-file generation corrupted. You might want to look into it!")
 
@@ -262,10 +293,12 @@ These are the parameters used in the production of this HELIOS output.
                     "This file contains the corresponding layer temperatures and pressures.")
 
                 file.writelines(
-                    "\n{:<8}{:<18}{:<24}".format("layer", "temp.[K]", "press.[10^-6bar]")
+                    "\n{:<8}{:<18}{:<24}".format(
+                        "layer", "temp.[K]", "press.[10^-6bar]")
                 )
 
-                file.writelines("\n{:<8}{:<18g}{:<24g}".format("BOA", quant.T_lay[quant.nlayer], quant.p_int[0]))
+                file.writelines("\n{:<8}{:<18g}{:<24g}".format(
+                    "BOA", quant.T_lay[quant.nlayer], quant.p_int[0]))
 
                 for i in range(quant.nlayer):
                     if quant.p_lay[i] > 0.99:
@@ -274,7 +307,8 @@ These are the parameters used in the production of this HELIOS output.
                             + "{:<18g}".format(quant.T_lay[i])
                             + "{:<24g}".format(quant.p_lay[i]))
         except TypeError:
-            print("File '*_tp_cut.dat generation' corrupted. You might want to look into it!")
+            print(
+                "File '*_tp_cut.dat generation' corrupted. You might want to look into it!")
 
     @staticmethod
     def write_colmass_mu_cp_entropy(quant, read):
@@ -309,7 +343,8 @@ These are the parameters used in the production of this HELIOS output.
                     else:
                         file.writelines("{:<30g}".format(quant.entropy_lay[i]))
         except TypeError:
-            print("File '*_colmass_mu_cp_kappa_entropy.dat' generation corrupted. You might want to look into it!")
+            print(
+                "File '*_colmass_mu_cp_kappa_entropy.dat' generation corrupted. You might want to look into it!")
 
     @staticmethod
     def write_integrated_flux(quant, read):
@@ -363,7 +398,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.ninterface):
-                        file.writelines("{:<16.8e}".format(quant.F_up_band[x + i * quant.nbin]))
+                        file.writelines("{:<16.8e}".format(
+                            quant.F_up_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Upward spectral flux-file generation corrupted. You might want to look into it!")
@@ -388,7 +424,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.ninterface):
-                        file.writelines("{:<16.8e}".format(quant.F_down_band[x + i * quant.nbin]))
+                        file.writelines("{:<16.8e}".format(
+                            quant.F_down_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Downward spectral flux-file generation corrupted. You might want to look into it!")
@@ -455,7 +492,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.ninterface):
-                        file.writelines("{:<16.8e}".format(quant.F_dir_band[x + i * quant.nbin]))
+                        file.writelines("{:<16.8e}".format(
+                            quant.F_dir_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Direct irradiation flux-file generation corrupted. You might want to look into it!")
@@ -473,7 +511,8 @@ These are the parameters used in the production of this HELIOS output.
                             "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                     )
                     for i in range(quant.ninterface):
-                        file.writelines("{:<6}{:g}{:<4}".format("B_int[", i, "]"))
+                        file.writelines(
+                            "{:<6}{:g}{:<4}".format("B_int[", i, "]"))
                     for x in range(quant.nbin):
                         file.writelines("\n{:<8g}".format(x)
                                         + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -481,7 +520,8 @@ These are the parameters used in the production of this HELIOS output.
                                         + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                         )
                         for i in range(quant.ninterface):
-                            file.writelines("{:<16g}".format(quant.planckband_int[i + x * quant.ninterface]))
+                            file.writelines("{:<16g}".format(
+                                quant.planckband_int[i + x * quant.ninterface]))
             except TypeError:
                 print(
                     "Planck-file (interfaces) generation corrupted. You might want to look into it!")
@@ -509,7 +549,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer+2):
-                        file.writelines("{:<16g}".format(quant.planckband_lay[i + x * (quant.nlayer+2)]))
+                        file.writelines("{:<16g}".format(
+                            quant.planckband_lay[i + x * (quant.nlayer+2)]))
         except TypeError:
             print(
                 "Planck-file (layer centers) generation corrupted. You might want to look into it!")
@@ -526,7 +567,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<9}{:g}{:<4}".format("opac_lay[", i, "]"))
+                    file.writelines(
+                        "{:<9}{:g}{:<4}".format("opac_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -534,7 +576,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<16g}".format(quant.opac_band_lay[x + quant.nbin * i]))
+                        file.writelines("{:<16g}".format(
+                            quant.opac_band_lay[x + quant.nbin * i]))
         except TypeError:
             print("Opacity file generation corrupted. You might want to look into it!")
 
@@ -551,7 +594,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<20}{:g}{:<4}".format("scat_cross_sect_lay[", i, "]"))
+                    file.writelines("{:<20}{:g}{:<4}".format(
+                        "scat_cross_sect_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -578,7 +622,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<21}{:g}{:<4}".format("cloud_cross_sect_lay[", i, "]"))
+                    file.writelines("{:<21}{:g}{:<4}".format(
+                        "cloud_cross_sect_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -586,7 +631,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<25g}".format(quant.cloud_scat_cross_lay[x + quant.nbin * i]))
+                        file.writelines("{:<25g}".format(
+                            quant.cloud_scat_cross_lay[x + quant.nbin * i]))
         except TypeError:
             print(
                 "Cloud scattering cross section file generation corrupted. You might want to look into it!")
@@ -599,7 +645,8 @@ These are the parameters used in the production of this HELIOS output.
                 file.writelines("This file contains the cloud absorption opacities "
                                 "at each layer center.")
                 file.writelines(
-                    "\n{:<8}{:<25}{:<21}".format("layer", "cent.press.[10^-6bar]", "opacity[cm^2g^-1]")
+                    "\n{:<8}{:<25}{:<21}".format(
+                        "layer", "cent.press.[10^-6bar]", "opacity[cm^2g^-1]")
                 )
                 for i in range(quant.nlayer):
                     file.writelines("\n{:<8g}".format(i)
@@ -622,7 +669,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<8}{:g}{:<4}".format("g_0_lay[", i, "]"))
+                    file.writelines(
+                        "{:<8}{:g}{:<4}".format("g_0_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -630,7 +678,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<16g}".format(quant.g_0_tot_lay[x + quant.nbin * i]))
+                        file.writelines("{:<16g}".format(
+                            quant.g_0_tot_lay[x + quant.nbin * i]))
         except TypeError:
             print(
                 "Asymmetry parameter file generation corrupted. You might want to look into it!")
@@ -640,13 +689,15 @@ These are the parameters used in the production of this HELIOS output.
         """ writes the transmission function for each layer to a file. """
         try:
             with open(read.output_path + quant.name + "/" + quant.name + "_transmission.dat", "w") as file:
-                file.writelines("This file contains the transmission function for each layer and waveband.")
+                file.writelines(
+                    "This file contains the transmission function for each layer and waveband.")
                 file.writelines(
                     "\n{:<8}{:<18}{:21}{:19}".format(
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<11}{:g}{:<4}".format("transm_lay[", i, "]"))
+                    file.writelines("{:<11}{:g}{:<4}".format(
+                        "transm_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -654,7 +705,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<18g}".format(quant.trans_band[x + i * quant.nbin]))
+                        file.writelines("{:<18g}".format(
+                            quant.trans_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Transmission file generation corrupted. You might want to look into it!")
@@ -664,13 +716,15 @@ These are the parameters used in the production of this HELIOS output.
         """ writes the optical depth for each layer to a file. """
         try:
             with open(read.output_path + quant.name + "/" + quant.name + "_optdepth.dat", "w") as file:
-                file.writelines("This file contains the optical depth for each layer and waveband.")
+                file.writelines(
+                    "This file contains the optical depth for each layer and waveband.")
                 file.writelines(
                     "\n{:<8}{:<18}{:21}{:19}".format(
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<14}{:g}{:<4}".format("delta_tau_lay[", i, "]"))
+                    file.writelines("{:<14}{:g}{:<4}".format(
+                        "delta_tau_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -678,7 +732,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<22g}".format(quant.delta_tau_band[x + i * quant.nbin]))
+                        file.writelines("{:<22g}".format(
+                            quant.delta_tau_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Transmission file generation corrupted. You might want to look into it!")
@@ -688,7 +743,6 @@ These are the parameters used in the production of this HELIOS output.
         """ writes the contribution function for each layer and waveband to a file. """
         try:
             with open(read.output_path + quant.name + "/" + quant.name + "_contribution.dat", "w") as file:
-                file.writelines("This file contains the contribution function for each layer and waveband.")
                 file.writelines(
                     "This file contains the contribution function for each layer and waveband.")
                 file.writelines(
@@ -696,7 +750,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<15}{:g}{:<4}".format("contr_func_lay[", i, "]"))
+                    file.writelines("{:<15}{:g}{:<4}".format(
+                        "contr_func_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -704,7 +759,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<22g}".format(quant.contr_func_band[x + i * quant.nbin]))
+                        file.writelines("{:<22g}".format(
+                            quant.contr_func_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Contribution function file generation corrupted. You might want to look into it!")
@@ -721,7 +777,8 @@ These are the parameters used in the production of this HELIOS output.
                         "bin", "cent_lambda[um]", "low_int_lambda[um]", "delta_lambda[um]")
                 )
                 for i in range(quant.nlayer):
-                    file.writelines("{:<18}{:g}{:<4}".format("transm_weight_lay[", i, "]"))
+                    file.writelines("{:<18}{:g}{:<4}".format(
+                        "transm_weight_lay[", i, "]"))
                 for x in range(quant.nbin):
                     file.writelines("\n{:<8g}".format(x)
                                     + "{:<18g}".format(quant.opac_wave[x] * 1e4)
@@ -729,7 +786,8 @@ These are the parameters used in the production of this HELIOS output.
                                     + "{:<19g}".format(quant.opac_deltawave[x] * 1e4)
                                     )
                     for i in range(quant.nlayer):
-                        file.writelines("{:<25g}".format(quant.trans_weight_band[x + i * quant.nbin]))
+                        file.writelines("{:<25g}".format(
+                            quant.trans_weight_band[x + i * quant.nbin]))
         except TypeError:
             print(
                 "Tranmission weighting function file generation corrupted. You might want to look into it!")
@@ -744,11 +802,11 @@ These are the parameters used in the production of this HELIOS output.
                                 "\nMean opacity given in [cm^2 g^-1].")
 
                 file.writelines("\n{:<10}{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}".format(
-                                "layer","press.[10^-6bar]",
-                                "Planck_opac_T_lay","Ross_opac_T_lay",
-                                "Planck_opac_T_star","Ross_opac_T_star",
-                                "Planck_tau_T_lay","Ross_tau_T_lay",
-                                "Planck_tau_T_star","Ross_tau_T_star")
+                                "layer", "press.[10^-6bar]",
+                                "Planck_opac_T_lay", "Ross_opac_T_lay",
+                                "Planck_opac_T_star", "Ross_opac_T_star",
+                                "Planck_tau_T_lay", "Ross_tau_T_lay",
+                                "Planck_tau_T_star", "Ross_tau_T_star")
                                 )
                 for i in range(quant.nlayer):
                     file.writelines(

@@ -4,11 +4,10 @@
 
 ### GENERAL ###                                                                 ### INFO ###
 
-
-name =                                  pylfrodull                                      (name of the output subdirectory and file prefix.)
+name =                                  pylfrodullbeam                                      (name of the output subdirectory and file prefix.)
 output directory =                      ./output/                              (main path to output)
 precision =                             double                                 (double or single. but actually only double makes sense.)
-realtime plotting =                     yes                                     (yes, no, interval value)
+realtime plotting =                     no                                     (yes, no, interval value)
 ———
 
 ### GRID ###
@@ -31,7 +30,7 @@ TP profile smoothing =                  no                                     (
 
 ### RADIATION ###
 
-direct irradiation beam =               no                                    ('yes': star is a point-source. 'no': isotropic irradiation assumed.)
+direct irradiation beam =               yes                                    ('yes': star is a point-source. 'no': isotropic irradiation assumed.)
 scattering =                            yes
 improved two-stream correction =        no                                     ('yes', 'no')
 asymmetry factor g_0 =                  0                                      (values: [-1, 1]. 0: isotropic scattering. 1: pure forward, -1: pure backward.)
@@ -62,7 +61,6 @@ path to stellar spectrum file =         ./input/stellar_sample.h5
 ——pre-tabulated——
 planet =                                HD189733b                              (manual, name in the file)
 path to planet data file =              ./input/planet_data.dat
-planet type =                           gas
 ——manual input——
 surface gravity [cm s^-2] =             3.05
 orbital distance [AU] =                 0.0115
