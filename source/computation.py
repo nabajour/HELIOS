@@ -41,7 +41,7 @@ class Compute(object):
 
     def construct_grid(self, quant):
         """ constructs the atmospheric grid """
-
+        # TODO: is this still used ? Doesn't look like it's used anymore
         gridkernel = self.mod.get_function("gridkernel")
 
         gridkernel(quant.dev_p_lay,
