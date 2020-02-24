@@ -293,8 +293,7 @@ class Compute(object):
                 quant.dev_F_net.ptr,           # out
                 quant.dev_F_down_band.ptr,     # out
                 quant.dev_F_up_band.ptr,       # out
-                quant.dev_F_dir_band.ptr,      # out
-                quant.dev_gauss_weight.ptr    # in
+                quant.dev_F_dir_band.ptr      # out
             )
 
             # uncomment for time testing purposes
